@@ -58,7 +58,7 @@ _tasks:
   # Run migration and generate types
   - command: "yarn db:migrate"
     when: "{{ _copier_operation == 'copy' }}"
-  - command: "yarn db:codegen"
+  - command: "bash -c 'set -a && source .env && set +a && yarn db:codegen'"
     when: "{{ _copier_operation == 'copy' }}"
   # Install lefthook (conditional)
   - command: "npx lefthook install"
