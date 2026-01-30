@@ -60,9 +60,9 @@ _tasks:
     when: "{{ _copier_operation == 'copy' }}"
   - command: "bash -c 'set -a && source .env && set +a && yarn db:codegen'"
     when: "{{ _copier_operation == 'copy' }}"
-  # Install lefthook (conditional)
-  - command: "npx lefthook install"
-    when: "{{ _copier_operation == 'copy' and include_git_hooks }}"
-  # Initialize git repo
+  # Initialize git repo (must come before lefthook install)
   - command: "git init && git add -A && git commit -m 'Initial scaffold from gallop-template'"
     when: "{{ _copier_operation == 'copy' }}"
+  # Install lefthook (conditional, requires git repo)
+  - command: "npx lefthook install"
+    when: "{{ _copier_operation == 'copy' and include_git_hooks }}"
