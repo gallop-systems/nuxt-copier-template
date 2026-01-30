@@ -1,0 +1,97 @@
+# {{ project_name }}
+
+{{ project_description }}
+
+## Tech stack
+
+- **Framework:** [Nuxt 4](https://nuxt.com/) (Vue 3, TypeScript)
+- **Styling:** [Tailwind CSS 4](https://tailwindcss.com/)
+- **UI Components:** [Volt](https://volt.primevue.org/) (PrimeVue + Tailwind)
+- **Database:** PostgreSQL with [Kysely](https://kysely.dev/) (type-safe query builder)
+- **Validation:** [Zod](https://zod.dev/)
+- **Auth:** [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils) (session-based{% if include_google_oauth %}, Google OAuth{% endif %})
+- **Testing:** [Vitest](https://vitest.dev/) with transaction-based DB isolation
+- **Package Manager:** Yarn 4
+- **Node:** 22+
+
+## Getting started
+
+```bash
+# Install dependencies
+yarn install
+
+# Start the dev server
+yarn dev
+```
+
+The app runs at http://localhost:3000.
+
+### Environment variables
+
+Copy `.env.example` to `.env` and fill in the values:
+
+| Variable | Description |
+|---|---|
+| `NUXT_DATABASE_URL` | PostgreSQL connection string |
+| `NUXT_SESSION_PASSWORD` | Secret for signing session cookies |
+{% if include_google_oauth %}| `NUXT_OAUTH_GOOGLE_CLIENT_ID` | Google OAuth client ID |
+| `NUXT_OAUTH_GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+{% endif %}
+## Database
+
+```bash
+# Run pending migrations
+yarn db:migrate
+
+# Rollback the last migration
+yarn db:migrate:down
+
+# Create a new migration
+yarn db:migrate:make <name>
+
+# Regenerate TypeScript types from the database schema
+yarn db:codegen
+```
+
+After creating or modifying tables, run `yarn db:codegen` to keep the generated types in `server/db/db.d.ts` up to date.
+
+## Testing
+
+Backend tests run against a real PostgreSQL database (`{{ database_name }}-test`). Each test runs inside a transaction that is rolled back automatically, so tests are fast and fully isolated.
+
+```bash
+# Run backend tests (watch mode)
+yarn test
+
+# Run backend tests once
+yarn test:run
+
+# Run frontend tests (watch mode)
+yarn test:frontend
+
+# Run frontend tests once
+yarn test:frontend:run
+```
+
+## Project structure
+
+```
+app/                  # Frontend
+├── components/       # Vue components
+├── composables/      # Shared composables
+├── layouts/          # Layout templates
+├── middleware/        # Route middleware
+├── pages/            # File-based routing
+└── plugins/          # Nuxt plugins
+
+server/               # Backend
+├── api/              # API route handlers
+├── db/
+│   ├── migrations/   # Kysely migrations
+│   └── db.d.ts       # Auto-generated DB types
+├── middleware/        # Server middleware
+├── test-utils/       # Test helpers, factories, mocks
+└── utils/            # Shared server utilities (db connection, etc.)
+
+src/volt/             # Volt UI components
+```
