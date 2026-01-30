@@ -1,10 +1,8 @@
+import { parseISO, format } from "date-fns";
+
 export function useFormatters() {
   function formatDate(dateString: string) {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    return format(parseISO(dateString), "MMM d, yyyy");
   }
 
   function formatCurrency(amount: number | string) {
