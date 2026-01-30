@@ -36,23 +36,36 @@ include_git_hooks:
 
 # Post-generation tasks
 _tasks:
+  # Create databases
   - command: "createdb {{ database_name }}"
     when: "{{ _copier_operation == 'copy' }}"
   - command: "createdb {{ database_name }}-test"
     when: "{{ _copier_operation == 'copy' }}"
+  # Create .env from example
+  - command: "cp .env.example .env"
+    when: "{{ _copier_operation == 'copy' }}"
+  # Install dependencies (skip builds to avoid nuxt prepare before env is ready)
   - command: "yarn install"
     when: "{{ _copier_operation == 'copy' }}"
+  # Install Volt components
   - command: "npx volt-vue add Button SecondaryButton Card InputText Password Select Textarea Avatar Tag DataTable Dialog ConfirmDialog Message Toast"
     when: "{{ _copier_operation == 'copy' }}"
+  # Create and populate users migration
   - command: "yarn db:migrate:make create_users_table"
     when: "{{ _copier_operation == 'copy' }}"
   - command: "node scripts/populate-initial-migration.mjs"
     when: "{{ _copier_operation == 'copy' }}"
+  # Run migration and generate types
   - command: "yarn db:migrate"
     when: "{{ _copier_operation == 'copy' }}"
   - command: "yarn db:codegen"
     when: "{{ _copier_operation == 'copy' }}"
+  # Run nuxt prepare (generates .nuxt types)
+  - command: "npx nuxt prepare"
+    when: "{{ _copier_operation == 'copy' }}"
+  # Install lefthook (conditional)
   - command: "npx lefthook install"
     when: "{{ _copier_operation == 'copy' and include_git_hooks }}"
+  # Initialize git repo
   - command: "git init && git add -A && git commit -m 'Initial scaffold from gallop-template'"
     when: "{{ _copier_operation == 'copy' }}"
