@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: {{ database_name }}-test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: corepack enable
+      - name: Get yarn cache directory
+        id: yarn-cache
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        with:
+          path: {% raw %}${{ steps.yarn-cache.outputs.dir }}{% endraw %}
+          key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
+          restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
+      - run: yarn install --immutable
+      - name: Run backend tests with coverage
+        run: yarn test --coverage
+        env:
+          TEST_POSTGRESQL_CONNECTION_STRING: postgres://postgres:postgres@localhost:5432/{{ database_name }}-test
+          NODE_OPTIONS: --experimental-strip-types
+      - name: Run frontend tests
+        run: yarn test:frontend:run
+        env:
+          NODE_OPTIONS: --experimental-strip-types
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: corepack enable
+      - name: Get yarn cache directory
+        id: yarn-cache
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        with:
+          path: {% raw %}${{ steps.yarn-cache.outputs.dir }}{% endraw %}
+          key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
+          restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
+      - run: yarn install --immutable
+      - run: npx nuxt typecheck
+
+  coverage:
+    runs-on: ubuntu-latest
+    needs: test
+    if: {% raw %}github.event_name == 'pull_request'{% endraw %}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+      - name: Coverage Report on PR
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          json-summary-path: ./coverage/coverage-summary.json
+          json-final-path: ./coverage/coverage-final.json
+          vite-config-path: ./vitest.config.ts
+      - name: Coverage Summary
+        run: |
+          COVERAGE=$(node -e "const c = require('./coverage/coverage-summary.json'); console.log(c.total.lines.pct)")
+          echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Coverage |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|----------|" >> $GITHUB_STEP_SUMMARY
+          node -e "
+            const c = require('./coverage/coverage-summary.json').total;
+            console.log('| Lines | ' + c.lines.pct + '% |');
+            console.log('| Statements | ' + c.statements.pct + '% |');
+            console.log('| Functions | ' + c.functions.pct + '% |');
+            console.log('| Branches | ' + c.branches.pct + '% |');
+          " >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Total: ${COVERAGE}% line coverage**" >> $GITHUB_STEP_SUMMARY

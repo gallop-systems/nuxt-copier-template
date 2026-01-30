@@ -1,0 +1,13 @@
+<template>
+{% raw %}
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
+{% endraw %}
+</template>
+
+<script setup lang="ts">
+useHead({
+  title: '{{ project_name }}',
+})
+</script>

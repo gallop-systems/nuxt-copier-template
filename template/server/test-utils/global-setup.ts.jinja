@@ -1,0 +1,82 @@
+import { Kysely, PostgresDialect, Migrator, FileMigrationProvider } from "kysely";
+import { Pool } from "pg";
+import path from "path";
+import { promises as fs } from "fs";
+
+function getTestConnectionString(): string {
+  if (process.env.TEST_POSTGRESQL_CONNECTION_STRING) {
+    return process.env.TEST_POSTGRESQL_CONNECTION_STRING;
+  }
+  return "postgresql://localhost/{{ database_name }}-test";
+}
+
+export async function setup() {
+  const testConnectionString = getTestConnectionString();
+  const pool = new Pool({ connectionString: testConnectionString });
+
+  // Check if database exists
+  try {
+    await pool.query("SELECT 1");
+  } catch (err: unknown) {
+    const pgError = err as { code?: string };
+    if (pgError.code === "3D000") {
+      console.error(`
+╭─────────────────────────────────────────────────────────────╮
+│  Error: Database "{{ database_name }}-test" does not exist. │
+│                                                             │
+│  Run this command to create it:                             │
+│                                                             │
+│    createdb {{ database_name }}-test                        │
+│                                                             │
+│  Then re-run your tests.                                    │
+╰─────────────────────────────────────────────────────────────╯
+`);
+      process.exit(1);
+    }
+    throw err;
+  }
+
+  // Drop all tables and types in public schema
+  await pool.query(`
+    DO $$ DECLARE
+      r RECORD;
+    BEGIN
+      FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+        EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+      END LOOP;
+      FOR r IN (SELECT typname FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE n.nspname = 'public' AND t.typtype = 'e') LOOP
+        EXECUTE 'DROP TYPE IF EXISTS ' || quote_ident(r.typname) || ' CASCADE';
+      END LOOP;
+    END $$;
+  `);
+
+  await pool.end();
+
+  // Run migrations from scratch
+  const db = new Kysely({
+    dialect: new PostgresDialect({
+      pool: new Pool({ connectionString: testConnectionString }),
+    }),
+  });
+
+  const migrator = new Migrator({
+    db,
+    provider: new FileMigrationProvider({
+      fs,
+      path,
+      migrationFolder: path.resolve(__dirname, "../db/migrations"),
+    }),
+  });
+
+  const { error, results } = await migrator.migrateToLatest();
+
+  if (error) {
+    console.error("Migration failed:", error);
+    throw error;
+  }
+
+  const applied = results?.filter((r) => r.status === "Success") ?? [];
+  console.log(`Test DB reset: applied ${applied.length} migrations to {{ database_name }}-test`);
+
+  await db.destroy();
+}

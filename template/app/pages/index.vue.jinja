@@ -1,0 +1,23 @@
+<template>
+{% raw %}
+  <div class="min-h-screen bg-zinc-50">
+    <AppHeader />
+    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <VoltCard>
+        <template #title>Welcome</template>
+        <template #content>
+          <p class="text-zinc-600">
+            Your project is ready. Start building!
+          </p>
+        </template>
+      </VoltCard>
+    </main>
+  </div>
+{% endraw %}
+</template>
+
+<script setup lang="ts">
+useHead({
+  title: '{{ project_name }}',
+})
+</script>

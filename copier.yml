@@ -1,0 +1,58 @@
+_subdirectory: template
+_templates_suffix: .jinja
+_skip_if_exists:
+  - ".env"
+
+# Questions
+project_name:
+  type: str
+  help: "Project name (used for package.json, DB names, etc.)"
+  validator: "{% if not project_name %}project_name is required{% endif %}"
+
+project_description:
+  type: str
+  help: "Project description for package.json"
+  default: ""
+
+database_name:
+  type: str
+  help: "PostgreSQL database name"
+  default: "{{ project_name }}"
+
+include_google_oauth:
+  type: bool
+  help: "Include Google OAuth config?"
+  default: true
+
+include_ci:
+  type: bool
+  help: "Include GitHub Actions CI workflow?"
+  default: true
+
+include_git_hooks:
+  type: bool
+  help: "Include lefthook git hooks?"
+  default: true
+
+# Post-generation tasks
+_tasks:
+  - command: "createdb {{ database_name }}"
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: "createdb {{ database_name }}-test"
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: "yarn install"
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: "npx volt-vue add Button SecondaryButton Card InputText Password Select Textarea Avatar Tag DataTable Dialog ConfirmDialog Message Toast"
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: "yarn db:migrate:make create_users_table"
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: "node scripts/populate-initial-migration.mjs"
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: "yarn db:migrate"
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: "yarn db:codegen"
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: "npx lefthook install"
+    when: "{{ _copier_operation == 'copy' and include_git_hooks }}"
+  - command: "git init && git add -A && git commit -m 'Initial scaffold from gallop-template'"
+    when: "{{ _copier_operation == 'copy' }}"

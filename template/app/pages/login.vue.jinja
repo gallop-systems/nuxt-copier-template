@@ -1,0 +1,39 @@
+<template>
+{% raw %}
+  <div class="flex min-h-screen items-center justify-center bg-zinc-50">
+    <div class="w-full max-w-sm space-y-6 px-4">
+      <div class="text-center">
+        <h1 class="text-2xl font-bold text-zinc-900">{{ projectName }}</h1>
+        <p class="mt-2 text-sm text-zinc-500">Sign in to continue</p>
+      </div>
+{% endraw %}
+      {% if include_google_oauth %}
+{% raw %}
+      <VoltButton
+        label="Sign in with Google"
+        icon="pi pi-google"
+        severity="secondary"
+        class="w-full"
+        @click="signInWithGoogle"
+      />
+{% endraw %}
+      {% endif %}
+{% raw %}
+    </div>
+  </div>
+{% endraw %}
+</template>
+
+<script setup lang="ts">
+definePageMeta({
+  layout: false,
+})
+
+const projectName = '{{ project_name }}'
+{% if include_google_oauth %}
+
+function signInWithGoogle() {
+  navigateTo('/api/auth/google', { external: true })
+}
+{% endif %}
+</script>

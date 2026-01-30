@@ -1,0 +1,91 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Commands
+
+```bash
+# Development
+yarn dev                    # Start dev server on http://localhost:3000
+
+# Database
+yarn db:migrate             # Run migrations
+yarn db:migrate:down        # Rollback last migration
+yarn db:migrate:make <name> # Create new migration
+yarn db:codegen             # Generate TypeScript types from database
+
+# Testing
+yarn test                   # Run backend tests (server/**/*.test.ts)
+yarn test:run               # Run backend tests once
+yarn test:frontend          # Run frontend tests (app/**/*.test.ts)
+yarn test:frontend:run      # Run frontend tests once
+
+# Build
+yarn build                  # Production build
+```
+
+**Environment:** Set `NUXT_DATABASE_URL` for PostgreSQL connection (auto-binds to `runtimeConfig.databaseUrl`).
+
+## Architecture
+
+### Nuxt 4 Structure
+- `app/` - Frontend (pages, components, assets)
+- `server/` - Backend (API handlers, database, test utilities)
+- `src/volt/` - Volt UI components (PrimeVue unstyled + Tailwind)
+
+### UI Components (Volt)
+Volt components are PrimeVue unstyled components with Tailwind styling. Registered with `Volt` prefix via nuxt.config.ts.
+
+**Customization:** Use `pt:section:class` syntax for pass-through styling:
+```vue
+<VoltButton pt:root:class="bg-zinc-900 hover:bg-zinc-800" />
+<VoltCard pt:root:class="rounded-2xl" pt:body:class="p-6" />
+```
+
+Available: VoltButton, VoltCard, VoltDataTable, VoltDialog, VoltInputText, VoltAvatar, VoltTag, VoltSelect, VoltTextarea, VoltPassword, VoltMessage, VoltToast, VoltConfirmDialog, VoltSecondaryButton
+
+### Database (Kysely + PostgreSQL)
+- `server/utils/db.ts` - Database connection, exports `db` and `useDatabase()`
+- `server/db/migrations/` - Kysely migrations
+- `server/db/db.d.ts` - Auto-generated types (via `yarn db:codegen`)
+- `kysely.config.ts` - Migration configuration
+
+### Backend Testing (Transaction Rollback Pattern)
+Tests use real PostgreSQL with automatic transaction rollback for isolation.
+
+```typescript
+import { test, expect, mockGet, mockPost, expectHttpError } from "~/server/test-utils";
+import handler from "./index.get";
+
+test("returns users", async ({ factories }) => {
+  await factories.user({ email: "alice@example.com", first_name: "Alice", last_name: "Smith" });
+  const event = mockGet();
+  const result = await handler(event);
+  expect(result).toHaveLength(1);
+});
+```
+
+- `factories` fixture creates test data within transaction
+- Always destructure `factories` even if unused (sets up transaction)
+- Mock helpers: `mockGet()`, `mockPost()`, `mockPut()`, `mockDelete()`
+- `expectHttpError(fn, statusCode)` - Assert handler throws HTTP error
+
+### API Handler Pattern
+```typescript
+import { z } from "zod";
+
+export default defineEventHandler(async (event) => {
+  const db = useDatabase();
+  const body = await readBody(event);
+  // ... validation with zod, database operations
+});
+```
+
+## Design System
+
+See `DESIGN_LANGUAGE.md` for the complete design system. Key points:
+
+- **Zinc-first palette** - Use zinc for almost everything
+- **Semantic colors only** - Emerald for success, red for danger
+- **No decorative shadows** - Only on hover for interactivity
+- **Icons** - PrimeIcons (`pi pi-*` classes)

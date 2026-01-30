@@ -1,0 +1,154 @@
+import { vi, test as base, expect } from "vitest";
+import { createEvent } from "h3";
+import { IncomingMessage, ServerResponse } from "http";
+import { Socket } from "net";
+import { db } from "../utils/db";
+import type { Transaction } from "kysely";
+import type { DB } from "../db/db";
+
+let currentTrx: Transaction<DB> | null = null;
+
+/**
+ * Stub useDatabase() to return the current test transaction.
+ */
+export function setupHandlerMocks() {
+  vi.stubGlobal("useDatabase", () => {
+    if (!currentTrx) throw new Error("No active test transaction");
+    return currentTrx;
+  });
+
+  vi.stubGlobal("defineEventHandler", (fn: Function) => fn);
+
+  vi.stubGlobal("createError", (opts: { statusCode: number; message: string }) => {
+    const err = new Error(opts.message) as any;
+    err.statusCode = opts.statusCode;
+    return err;
+  });
+
+  vi.stubGlobal("getQuery", (event: any) => event.__query || {});
+  vi.stubGlobal("readBody", (event: any) => event.__body || {});
+  vi.stubGlobal("getRouterParam", (event: any, name: string) => event.__params?.[name]);
+
+  vi.stubGlobal("getUserSession", async () => ({
+    user: { id: 1, email: "test@example.com", first_name: "Test", last_name: "User" },
+  }));
+}
+
+/**
+ * Create a mock H3 event for GET requests.
+ */
+export function mockGet(query: Record<string, string> = {}, params: Record<string, string> = {}) {
+  const req = new IncomingMessage(new Socket());
+  req.method = "GET";
+  req.url = "/";
+  const res = new ServerResponse(req);
+  const event = createEvent(req, res);
+  (event as any).__query = query;
+  (event as any).__params = params;
+  return event;
+}
+
+/**
+ * Create a mock H3 event for POST requests.
+ */
+export function mockPost(body: any = {}, params: Record<string, string> = {}) {
+  const req = new IncomingMessage(new Socket());
+  req.method = "POST";
+  req.url = "/";
+  const res = new ServerResponse(req);
+  const event = createEvent(req, res);
+  (event as any).__body = body;
+  (event as any).__params = params;
+  return event;
+}
+
+/**
+ * Create a mock H3 event for PUT requests.
+ */
+export function mockPut(body: any = {}, params: Record<string, string> = {}) {
+  const req = new IncomingMessage(new Socket());
+  req.method = "PUT";
+  req.url = "/";
+  const res = new ServerResponse(req);
+  const event = createEvent(req, res);
+  (event as any).__body = body;
+  (event as any).__params = params;
+  return event;
+}
+
+/**
+ * Create a mock H3 event for DELETE requests.
+ */
+export function mockDelete(params: Record<string, string> = {}) {
+  const req = new IncomingMessage(new Socket());
+  req.method = "DELETE";
+  req.url = "/";
+  const res = new ServerResponse(req);
+  const event = createEvent(req, res);
+  (event as any).__params = params;
+  return event;
+}
+
+/**
+ * Assert that a handler throws an HTTP error with the given status code.
+ */
+export async function expectHttpError(fn: () => Promise<any>, statusCode: number) {
+  try {
+    await fn();
+    throw new Error(`Expected HTTP ${statusCode} error but none was thrown`);
+  } catch (err: any) {
+    expect(err.statusCode).toBe(statusCode);
+    return err;
+  }
+}
+
+/**
+ * Factory helpers for creating test records.
+ */
+function createFactories(trx: Transaction<DB>) {
+  return {
+    async user(data: Partial<{
+      email: string;
+      first_name: string;
+      last_name: string;
+    }> = {}) {
+      const num = Math.floor(Math.random() * 10000);
+      return trx
+        .insertInto("users")
+        .values({
+          email: data.email ?? `test${num}@example.com`,
+          first_name: data.first_name ?? "Test",
+          last_name: data.last_name ?? "User",
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
+    },
+  };
+}
+
+type Factories = ReturnType<typeof createFactories>;
+
+interface TestContext {
+  factories: Factories;
+}
+
+/**
+ * Custom test fixture that wraps each test in a transaction
+ * that is rolled back after the test completes.
+ */
+export const test = base.extend<TestContext>({
+  factories: async ({}, use) => {
+    const trx = await db.transaction().execute(async (trx) => {
+      currentTrx = trx;
+      const factories = createFactories(trx);
+      await use(factories);
+      // Force rollback by throwing after test completes
+      throw new Error("ROLLBACK");
+    }).catch((err) => {
+      if (err.message !== "ROLLBACK") throw err;
+    });
+  },
+});
+
+export { describe } from "vitest";
+export { expect, mockGet, mockPost, mockPut, mockDelete };

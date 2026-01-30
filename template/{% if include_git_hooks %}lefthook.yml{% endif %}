@@ -1,0 +1,36 @@
+pre-push:
+  parallel: true
+  commands:
+    backend-test:
+      run: yarn test:run
+      skip:
+        - merge
+        - rebase
+    frontend-test:
+      run: yarn test:frontend:run
+      skip:
+        - merge
+        - rebase
+    typecheck:
+      run: npx nuxt typecheck
+      skip:
+        - merge
+        - rebase
+
+post-merge:
+  commands:
+    install-deps:
+      run: |
+        if git diff ORIG_HEAD HEAD --name-only | grep -qE '^(package\.json|yarn\.lock)$'; then
+          echo "Dependencies changed. Running yarn install..."
+          yarn install
+        fi
+
+    check-migrations:
+      run: |
+        if git diff ORIG_HEAD HEAD --name-only | grep -q '^server/db/migrations/'; then
+          echo ""
+          echo "New migrations detected!"
+          echo "Run: yarn db:migrate"
+          echo ""
+        fi

@@ -1,0 +1,39 @@
+export default defineOAuthGoogleEventHandler({
+  async onSuccess(event, { user }) {
+    const db = useDatabase();
+
+    // Find or create user
+    let dbUser = await db
+      .selectFrom("users")
+      .selectAll()
+      .where("email", "=", user.email)
+      .executeTakeFirst();
+
+    if (!dbUser) {
+      dbUser = await db
+        .insertInto("users")
+        .values({
+          email: user.email,
+          first_name: user.given_name || user.name?.split(" ")[0] || "",
+          last_name: user.family_name || user.name?.split(" ").slice(1).join(" ") || "",
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
+    }
+
+    await setUserSession(event, {
+      user: {
+        id: dbUser.id,
+        email: dbUser.email,
+        first_name: dbUser.first_name,
+        last_name: dbUser.last_name,
+      },
+    });
+
+    return sendRedirect(event, "/");
+  },
+  onError(event, error) {
+    console.error("Google OAuth error:", error);
+    return sendRedirect(event, "/login");
+  },
+});
