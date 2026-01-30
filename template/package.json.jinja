@@ -17,7 +17,7 @@
     "db:migrate": "kysely migrate:latest",
     "db:migrate:down": "kysely migrate:down",
     "db:migrate:make": "kysely migrate:make",
-    "db:codegen": "kysely-codegen --url $NUXT_DATABASE_URL --out-file server/db/db.d.ts"
+    "db:codegen": "kysely-codegen --url $NUXT_DATABASE_URL --out-file server/db/db.d.ts --dialect postgres --date-parser string"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
