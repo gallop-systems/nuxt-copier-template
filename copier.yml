@@ -60,9 +60,6 @@ _tasks:
     when: "{{ _copier_operation == 'copy' }}"
   - command: "yarn db:codegen"
     when: "{{ _copier_operation == 'copy' }}"
-  # Run nuxt prepare (generates .nuxt types)
-  - command: "npx nuxt prepare"
-    when: "{{ _copier_operation == 'copy' }}"
   # Install lefthook (conditional)
   - command: "npx lefthook install"
     when: "{{ _copier_operation == 'copy' and include_git_hooks }}"
