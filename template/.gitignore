@@ -36,5 +36,3 @@ logs
 # Testing
 coverage
 
-# Generated types
-server/db/db.d.ts
