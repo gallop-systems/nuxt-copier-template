@@ -1,3 +1,10 @@
+/**
+ * Test Utilities
+ *
+ * Helpers for testing Nuxt/Nitro API handlers with real PostgreSQL.
+ * Auto-import mocks are set up via vitest setupFiles (see setup.ts).
+ */
+
 import { vi, test as base, expect } from "vitest";
 import { createEvent } from "h3";
 import { IncomingMessage, ServerResponse } from "http";
@@ -8,115 +15,157 @@ import type { DB } from "../db/db";
 
 let currentTrx: Transaction<DB> | null = null;
 
-/**
- * Stub useDatabase() to return the current test transaction.
- */
-export function setupHandlerMocks() {
+// ============================================================================
+// Global Stubs
+// ============================================================================
+
+export async function setupHandlerMocks() {
+  vi.stubGlobal("defineEventHandler", (handler: Function) => handler);
+
   vi.stubGlobal("useDatabase", () => {
-    if (!currentTrx) throw new Error("No active test transaction");
+    if (!currentTrx) {
+      throw new Error("useDatabase called outside of test transaction");
+    }
     return currentTrx;
   });
 
-  vi.stubGlobal("defineEventHandler", (fn: Function) => fn);
+  // Handle nested transactions - when code calls trx.transaction().execute(),
+  // just pass through the existing transaction instead of creating a new one
+  const KyselyModule = await import("kysely");
+  const TransactionClass = (KyselyModule as any).Transaction;
+  if (TransactionClass?.prototype) {
+    TransactionClass.prototype.transaction = function () {
+      const self = this;
+      return {
+        execute: async <T>(callback: (trx: any) => Promise<T>): Promise<T> => {
+          return callback(self);
+        },
+      };
+    };
+  }
 
-  vi.stubGlobal("createError", (opts: { statusCode: number; message: string }) => {
-    const err = new Error(opts.message) as any;
-    err.statusCode = opts.statusCode;
-    return err;
+  vi.stubGlobal("createError", (opts: {
+    statusCode: number;
+    message?: string;
+    statusMessage?: string;
+    data?: unknown;
+  }) => {
+    const error = new Error(opts.message || opts.statusMessage || "") as any;
+    error.statusCode = opts.statusCode;
+    if (opts.data !== undefined) error.data = opts.data;
+    return error;
   });
 
-  vi.stubGlobal("getQuery", (event: any) => event.__query || {});
-  vi.stubGlobal("readBody", (event: any) => event.__body || {});
-  vi.stubGlobal("getRouterParam", (event: any, name: string) => event.__params?.[name]);
+  vi.stubGlobal("getValidatedRouterParams", async (event: any, validate: Function) => {
+    return validate(event.context.params ?? {});
+  });
+
+  vi.stubGlobal("getRouterParam", (event: any, param: string) => {
+    return event.context.params?.[param];
+  });
+
+  vi.stubGlobal("getValidatedQuery", async (event: any, validate: Function) => {
+    return validate(event.context._mockQuery ?? {});
+  });
+
+  vi.stubGlobal("getQuery", (event: any) => {
+    return event.context._mockQuery ?? {};
+  });
+
+  vi.stubGlobal("readValidatedBody", async (event: any, validate: Function) => {
+    return validate(event.context._mockBody ?? {});
+  });
+
+  vi.stubGlobal("readBody", async (event: any) => event.context._mockBody);
 
   vi.stubGlobal("getUserSession", async () => ({
     user: { id: 1, email: "test@example.com", first_name: "Test", last_name: "User" },
   }));
 }
 
-/**
- * Create a mock H3 event for GET requests.
- */
-export function mockGet(query: Record<string, string> = {}, params: Record<string, string> = {}) {
-  const req = new IncomingMessage(new Socket());
-  req.method = "GET";
-  req.url = "/";
+// ============================================================================
+// Mock Event Helpers
+// ============================================================================
+
+type Params = Record<string, string | number>;
+
+export function createMockEvent(options: {
+  method?: string;
+  params?: Params;
+  body?: unknown;
+  query?: Record<string, string>;
+}) {
+  const { method = "GET", params = {}, body, query = {} } = options;
+
+  const socket = new Socket();
+  const req = new IncomingMessage(socket);
+  req.method = method;
+  req.url = "/" + (Object.keys(query).length
+    ? "?" + new URLSearchParams(query).toString()
+    : "");
+
   const res = new ServerResponse(req);
   const event = createEvent(req, res);
-  (event as any).__query = query;
-  (event as any).__params = params;
+
+  event.context.params = Object.fromEntries(
+    Object.entries(params).map(([k, v]) => [k, String(v)])
+  );
+
+  if (body !== undefined) event.context._mockBody = body;
+  if (Object.keys(query).length > 0) event.context._mockQuery = query;
+
   return event;
 }
 
-/**
- * Create a mock H3 event for POST requests.
- */
-export function mockPost(body: any = {}, params: Record<string, string> = {}) {
-  const req = new IncomingMessage(new Socket());
-  req.method = "POST";
-  req.url = "/";
-  const res = new ServerResponse(req);
-  const event = createEvent(req, res);
-  (event as any).__body = body;
-  (event as any).__params = params;
-  return event;
+export function mockGet(params: Params = {}, query?: Record<string, string>) {
+  return createMockEvent({ method: "GET", params, query });
 }
 
-/**
- * Create a mock H3 event for PUT requests.
- */
-export function mockPut(body: any = {}, params: Record<string, string> = {}) {
-  const req = new IncomingMessage(new Socket());
-  req.method = "PUT";
-  req.url = "/";
-  const res = new ServerResponse(req);
-  const event = createEvent(req, res);
-  (event as any).__body = body;
-  (event as any).__params = params;
-  return event;
+export function mockPost(params: Params = {}, body: unknown) {
+  return createMockEvent({ method: "POST", params, body });
 }
 
-/**
- * Create a mock H3 event for DELETE requests.
- */
-export function mockDelete(params: Record<string, string> = {}) {
-  const req = new IncomingMessage(new Socket());
-  req.method = "DELETE";
-  req.url = "/";
-  const res = new ServerResponse(req);
-  const event = createEvent(req, res);
-  (event as any).__params = params;
-  return event;
+export function mockPut(params: Params = {}, body: unknown) {
+  return createMockEvent({ method: "PUT", params, body });
 }
 
-/**
- * Assert that a handler throws an HTTP error with the given status code.
- */
-export async function expectHttpError(fn: () => Promise<any>, statusCode: number) {
-  try {
-    await fn();
-    throw new Error(`Expected HTTP ${statusCode} error but none was thrown`);
-  } catch (err: any) {
-    expect(err.statusCode).toBe(statusCode);
-    return err;
-  }
+export function mockPatch(params: Params, body: unknown) {
+  return createMockEvent({ method: "PATCH", params, body });
 }
 
-/**
- * Factory helpers for creating test records.
- */
+export function mockDelete(params: Params) {
+  return createMockEvent({ method: "DELETE", params });
+}
+
+// ============================================================================
+// Assertion Helpers
+// ============================================================================
+
+export async function expectHttpError(
+  promise: Promise<unknown>,
+  expected: { statusCode: number; message?: string }
+) {
+  await expect(promise).rejects.toMatchObject(expected);
+}
+
+// ============================================================================
+// Factories
+// ============================================================================
+
 function createFactories(trx: Transaction<DB>) {
+  const num = () => Math.floor(Math.random() * 10000);
+
   return {
     async user(data: Partial<{
       email: string;
       first_name: string;
       last_name: string;
     }> = {}) {
-      const num = Math.floor(Math.random() * 10000);
+      const n = num();
       return trx
         .insertInto("users")
         .values({
-          email: data.email ?? `test${num}@example.com`,
+          email: data.email ?? `test${n}@example.com`,
           first_name: data.first_name ?? "Test",
           last_name: data.last_name ?? "User",
         })
@@ -126,28 +175,39 @@ function createFactories(trx: Transaction<DB>) {
   };
 }
 
-type Factories = ReturnType<typeof createFactories>;
+export type Factories = ReturnType<typeof createFactories>;
 
-interface TestContext {
+// ============================================================================
+// Test Fixture
+// ============================================================================
+
+interface TestFixtures {
   factories: Factories;
+  db: Transaction<DB>;
 }
 
-/**
- * Custom test fixture that wraps each test in a transaction
- * that is rolled back after the test completes.
- */
-export const test = base.extend<TestContext>({
+export const test = base.extend<TestFixtures>({
   factories: async ({}, use) => {
-    const trx = await db.transaction().execute(async (trx) => {
+    await db.transaction().execute(async (trx) => {
       currentTrx = trx;
-      const factories = createFactories(trx);
-      await use(factories);
-      // Force rollback by throwing after test completes
-      throw new Error("ROLLBACK");
-    }).catch((err) => {
-      if (err.message !== "ROLLBACK") throw err;
+      try {
+        await use(createFactories(trx));
+        throw { __rollback: true };
+      } finally {
+        currentTrx = null;
+      }
+    }).catch((e) => {
+      if (e && typeof e === "object" && "__rollback" in e) return;
+      throw e;
     });
+  },
+
+  db: async ({ factories: _ }, use) => {
+    if (!currentTrx) {
+      throw new Error("db fixture used outside transaction context");
+    }
+    await use(currentTrx);
   },
 });
 
-export { describe, expect } from "vitest";
+export { describe, expect, beforeAll } from "vitest";
