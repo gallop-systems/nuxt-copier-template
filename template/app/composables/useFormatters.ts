@@ -12,6 +12,10 @@ export function useFormatters() {
     }).format(Number(amount));
   }
 
+  function formatNumber(value: number | string) {
+    return new Intl.NumberFormat("en-US").format(Number(value));
+  }
+
   function getInitials(name: string) {
     return name
       .split(" ")
@@ -24,6 +28,7 @@ export function useFormatters() {
   return {
     formatDate,
     formatCurrency,
+    formatNumber,
     getInitials,
   };
 }
