@@ -21,7 +21,7 @@ A [Copier](https://copier.readthedocs.io/) template for full-stack Nuxt 4 applic
 ## Creating a new project
 
 ```bash
-copier copy gh:yeedle/copier-nuxt my-app
+copier copy gh:gallop-systems/nuxt-copier-template my-app
 ```
 
 Or from a local clone:
