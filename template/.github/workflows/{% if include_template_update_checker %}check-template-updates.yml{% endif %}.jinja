@@ -74,25 +74,24 @@ jobs:
           **Current commit:** \`${{ '{{' }} steps.current.outputs.commit {{ '}}' }}\`
           **Latest commit:** \`${{ '{{' }} steps.latest.outputs.commit {{ '}}' }}\`
 
-          ### To apply the update:
-
-          \`\`\`bash
-          # Checkout this branch
-          git checkout $BRANCH
-          git pull
-
-          # Run copier update
-          copier update --trust
-
-          # Review changes, then commit and push
-          git add -A
-          git commit -m \"chore: apply template updates\"
-          git push
-          \`\`\`
-
           ### What's new?
 
           [View template changes](https://github.com/gallop-systems/nuxt-copier-template/compare/${{ '{{' }} steps.current.outputs.commit {{ '}}' }}...${{ '{{' }} steps.latest.outputs.commit {{ '}}' }})
+
+          ---
+
+          ### Instructions for Claude
+
+          To apply this template update:
+
+          1. Checkout this branch and pull latest
+          2. Run: \`uvx copier update --trust --defaults\`
+             - Use \`uvx copier\`, not \`copier\` directly (copier is not installed globally)
+             - Always include \`--defaults\` flag (required for non-interactive terminal)
+          3. Review and resolve any merge conflicts
+          4. Commit changes with message: \`chore: update to template vX.Y.Z\`
+          5. Update this PR title to: \`chore: update to template vX.Y.Z\` (get version from \`.copier-answers.yml\` \`_commit\` field after update, or from git tags on the template repo)
+          6. Push and merge when CI passes
 
           ---
           *This PR was automatically created by the template update checker.*"
