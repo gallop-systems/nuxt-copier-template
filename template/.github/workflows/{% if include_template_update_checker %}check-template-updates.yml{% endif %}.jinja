@@ -1,0 +1,87 @@
+name: Check Template Updates
+
+on:
+  schedule:
+    - cron: '0 9 * * *' # Daily at 9am UTC
+  workflow_dispatch:
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get current template commit
+        id: current
+        run: |
+          COMMIT=$(grep '_commit:' .copier-answers.yml | awk '{print $2}')
+          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
+
+      - name: Get latest template commit
+        id: latest
+        run: |
+          LATEST=$(git ls-remote https://github.com/gallop-systems/nuxt-copier-template.git HEAD | cut -f1)
+          echo "commit=$LATEST" >> $GITHUB_OUTPUT
+
+      - name: Check if update needed
+        id: check
+        run: |
+          if [ "${{ '{{' }} steps.current.outputs.commit {{ '}}' }}" != "${{ '{{' }} steps.latest.outputs.commit {{ '}}' }}" ]; then
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+          else
+            echo "needs_update=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create update branch and PR
+        if: steps.check.outputs.needs_update == 'true'
+        env:
+          GH_TOKEN: ${{ '{{' }} secrets.GITHUB_TOKEN {{ '}}' }}
+        run: |
+          BRANCH="chore/template-update-$(date +%Y%m%d)"
+
+          # Check if branch/PR already exists
+          if gh pr list --head "$BRANCH" --json number --jq length | grep -q "^[1-9]"; then
+            echo "PR already exists, skipping"
+            exit 0
+          fi
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create branch
+          git checkout -b "$BRANCH"
+          git push -u origin "$BRANCH"
+
+          # Create PR
+          gh pr create \
+            --title "🔄 Template update available" \
+            --body "## Template Update Available
+
+          The upstream template has new changes available.
+
+          **Current commit:** \`${{ '{{' }} steps.current.outputs.commit {{ '}}' }}\`
+          **Latest commit:** \`${{ '{{' }} steps.latest.outputs.commit {{ '}}' }}\`
+
+          ### To apply the update:
+
+          \`\`\`bash
+          # Checkout this branch
+          git checkout $BRANCH
+          git pull
+
+          # Run copier update
+          copier update --trust
+
+          # Review changes, then commit and push
+          git add -A
+          git commit -m \"chore: apply template updates\"
+          git push
+          \`\`\`
+
+          ### What's new?
+
+          [View template changes](https://github.com/gallop-systems/nuxt-copier-template/compare/${{ '{{' }} steps.current.outputs.commit {{ '}}' }}...${{ '{{' }} steps.latest.outputs.commit {{ '}}' }})
+
+          ---
+          *This PR was automatically created by the template update checker.*"

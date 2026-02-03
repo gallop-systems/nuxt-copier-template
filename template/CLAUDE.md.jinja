@@ -89,3 +89,27 @@ See `DESIGN_LANGUAGE.md` for the complete design system. Key points:
 - **Semantic colors only** - Emerald for success, red for danger
 - **No decorative shadows** - Only on hover for interactivity
 - **Icons** - PrimeIcons (`pi pi-*` classes)
+{% if include_template_update_checker %}
+## Template Updates
+
+This project was scaffolded from [gallop-systems/nuxt-copier-template](https://github.com/gallop-systems/nuxt-copier-template).
+
+The `.github/workflows/check-template-updates.yml` workflow runs daily to check for upstream template changes. When updates are available, it automatically opens a PR with instructions.
+
+To apply template updates:
+```bash
+# Checkout the PR branch
+git checkout chore/template-update-YYYYMMDD
+git pull
+
+# Apply updates
+copier update --trust
+
+# Review changes, commit, and push
+git add -A
+git commit -m "chore: apply template updates"
+git push
+```
+
+The PR includes a link to view what changed in the template since your last update.
+{% endif %}

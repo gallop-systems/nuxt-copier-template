@@ -34,6 +34,11 @@ include_git_hooks:
   help: "Include lefthook git hooks?"
   default: true
 
+include_template_update_checker:
+  type: bool
+  help: "Include workflow to check for template updates?"
+  default: true
+
 # Post-generation tasks
 _tasks:
   # Create databases
