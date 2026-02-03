@@ -1,8 +1,22 @@
 import { parseISO, format } from "date-fns";
 
 export function useFormatters() {
-  function formatDate(dateString: string) {
-    return format(parseISO(dateString), "MMM d, yyyy");
+  /**
+   * Format a date string. Uses parseISO from date-fns to correctly handle
+   * date-only strings like "2025-01-28" without timezone shifting issues.
+   * @param dateString - ISO date string (e.g., "2025-01-28" or "2025-01-28T12:00:00Z")
+   * @param formatStr - Optional date-fns format string (default: "MMM d, yyyy")
+   */
+  function formatDate(dateString: string, formatStr = "MMM d, yyyy") {
+    return format(parseISO(dateString), formatStr);
+  }
+
+  /**
+   * Format a date string as time only.
+   * @param dateString - ISO date string with time component
+   */
+  function formatTime(dateString: string) {
+    return format(parseISO(dateString), "h:mm a");
   }
 
   function formatCurrency(amount: number | string) {
@@ -27,6 +41,7 @@ export function useFormatters() {
 
   return {
     formatDate,
+    formatTime,
     formatCurrency,
     formatNumber,
     getInitials,
