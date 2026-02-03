@@ -43,18 +43,25 @@ jobs:
         run: |
           BRANCH="chore/template-update-$(date +%Y%m%d)"
 
-          # Check if branch/PR already exists
+          # Check if PR already exists
           if gh pr list --head "$BRANCH" --json number --jq length | grep -q "^[1-9]"; then
             echo "PR already exists, skipping"
             exit 0
+          fi
+
+          # Delete remote branch if it exists (from a previous failed run)
+          if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null 2>&1; then
+            echo "Deleting existing remote branch from previous failed run"
+            git push origin --delete "$BRANCH"
           fi
 
           # Configure git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Create branch
+          # Create branch with empty commit
           git checkout -b "$BRANCH"
+          git commit --allow-empty -m "chore: template update available"
           git push -u origin "$BRANCH"
 
           # Create PR
