@@ -23,6 +23,16 @@ export default isFrontendTest
         include: ["server/**/*.test.ts"],
         globalSetup: ["./server/test-utils/global-setup.ts"],
         setupFiles: ["./server/test-utils/setup.ts"],
+        coverage: {
+          provider: "v8",
+          reporter: ["text", "json", "json-summary"],
+          include: ["server/**/*.ts"],
+          exclude: [
+            "server/**/*.test.ts",
+            "server/test-utils/**",
+            "server/db/migrations/**",
+          ],
+        },
       },
       resolve: {
         alias: {
