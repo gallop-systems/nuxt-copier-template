@@ -20,7 +20,10 @@ yarn test:run               # Run backend tests once
 yarn test:frontend          # Run frontend tests in watch mode (app/**/*.test.ts)
 yarn test:frontend:run      # Run frontend tests once
 yarn typecheck              # Run TypeScript type checking
-yarn lint                   # Run ESLint
+yarn lint                   # Run oxlint (linter)
+yarn lint:fix               # Run oxlint with auto-fix
+yarn fmt                    # Format code with oxfmt
+yarn fmt:check              # Check formatting without writing
 
 # Build
 yarn build                  # Production build
