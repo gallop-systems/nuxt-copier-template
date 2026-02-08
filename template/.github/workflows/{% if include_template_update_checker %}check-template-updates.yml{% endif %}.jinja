@@ -15,22 +15,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Get current template commit
+      - name: Get current template version
         id: current
         run: |
-          COMMIT=$(grep '_commit:' .copier-answers.yml | awk '{print $2}')
-          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
+          VERSION=$(grep '_commit:' .copier-answers.yml | awk '{print $2}')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Get latest template commit
+      - name: Get latest template version
         id: latest
         run: |
-          LATEST=$(git ls-remote https://github.com/gallop-systems/nuxt-copier-template.git HEAD | cut -f1)
-          echo "commit=$LATEST" >> $GITHUB_OUTPUT
+          LATEST=$(git ls-remote --tags --refs --sort=-v:refname https://github.com/gallop-systems/nuxt-copier-template.git 'v*' | head -1 | sed 's/.*refs\/tags\///')
+          echo "version=$LATEST" >> $GITHUB_OUTPUT
 
       - name: Check if update needed
         id: check
         run: |
-          if [ "${{ '{{' }} steps.current.outputs.commit {{ '}}' }}" != "${{ '{{' }} steps.latest.outputs.commit {{ '}}' }}" ]; then
+          if [ "${{ '{{' }} steps.current.outputs.version {{ '}}' }}" != "${{ '{{' }} steps.latest.outputs.version {{ '}}' }}" ]; then
             echo "needs_update=true" >> $GITHUB_OUTPUT
           else
             echo "needs_update=false" >> $GITHUB_OUTPUT
@@ -71,12 +71,12 @@ jobs:
 
           The upstream template has new changes available.
 
-          **Current commit:** \`${{ '{{' }} steps.current.outputs.commit {{ '}}' }}\`
-          **Latest commit:** \`${{ '{{' }} steps.latest.outputs.commit {{ '}}' }}\`
+          **Current version:** \`${{ '{{' }} steps.current.outputs.version {{ '}}' }}\`
+          **Latest version:** \`${{ '{{' }} steps.latest.outputs.version {{ '}}' }}\`
 
           ### What's new?
 
-          [View template changes](https://github.com/gallop-systems/nuxt-copier-template/compare/${{ '{{' }} steps.current.outputs.commit {{ '}}' }}...${{ '{{' }} steps.latest.outputs.commit {{ '}}' }})
+          [View template changes](https://github.com/gallop-systems/nuxt-copier-template/compare/${{ '{{' }} steps.current.outputs.version {{ '}}' }}...${{ '{{' }} steps.latest.outputs.version {{ '}}' }})
 
           ---
 
