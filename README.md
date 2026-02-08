@@ -66,11 +66,12 @@ Copier diffs the template version you originally copied against the latest tagge
 
 ## Versioning
 
-Copier uses git tags to track template versions. Every time you make a meaningful change to the template, tag a new release:
+Copier uses git tags to track template versions. Every time you make a meaningful change to the template, tag and release:
 
 ```bash
 git tag v0.1.0
 git push origin v0.1.0
+gh release create v0.1.0 --title "v0.1.0" --notes "- Your changes here"
 ```
 
 Use [semver](https://semver.org/):
@@ -78,6 +79,8 @@ Use [semver](https://semver.org/):
 - **Patch** (`v0.1.1`): bug fixes, dependency bumps
 - **Minor** (`v0.2.0`): new features, new questions, new optional components
 - **Major** (`v1.0.0`): breaking changes to project structure or configuration
+
+Creating a GitHub release (not just a tag) is important because downstream projects with the template update checker will link to release notes in their update PRs.
 
 Without tags, `copier copy` will warn "No git tags found in template" and `copier update` won't work in downstream projects.
 
