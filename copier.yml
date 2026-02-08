@@ -61,7 +61,7 @@ _tasks:
   - command: "node scripts/populate-initial-migration.mjs"
     when: "{{ _copier_operation == 'copy' }}"
   # Run migration and generate types
-  - command: "yarn db:migrate"
+  - command: "bash -c 'set -a && source .env && set +a && yarn db:migrate'"
     when: "{{ _copier_operation == 'copy' }}"
   - command: "bash -c 'set -a && source .env && set +a && yarn db:codegen'"
     when: "{{ _copier_operation == 'copy' }}"

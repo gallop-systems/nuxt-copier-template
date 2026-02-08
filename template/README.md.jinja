@@ -108,12 +108,17 @@ An example app spec is provided at `.do/app.yaml.example`. To deploy:
    - `github.repo`: Your GitHub org/repo
    - `github.branch`: Your deployment branch (usually `main`)
 3. Set up secrets in DO App Platform:
-   - `NUXT_DATABASE_URL`: Your PostgreSQL connection string
-   - `NUXT_SESSION_SECRET`: A secure random string for session signing
+   - `NUXT_DATABASE_URL`: Your PostgreSQL connection string (see note below)
+   - `NUXT_SESSION_PASSWORD`: A secure random string for session signing
 {%- if include_google_oauth %}
    - `NUXT_OAUTH_GOOGLE_CLIENT_ID`: Google OAuth client ID
    - `NUXT_OAUTH_GOOGLE_CLIENT_SECRET`: Google OAuth client secret
 {%- endif %}
+
+**Important:** For DO managed PostgreSQL databases, add `uselibpqcompat=true` to your connection string to avoid SSL certificate issues:
+```
+postgresql://user:pass@host:25060/db?sslmode=require&uselibpqcompat=true
+```
 
 The app spec includes a `PRE_DEPLOY` job that runs database migrations automatically before each deployment.
 
@@ -126,6 +131,7 @@ If you're using auto-generated app specs instead of a spec file:
 3. Configure the job:
    - **Name:** `migrate`
    - **Type:** Pre Deploy
+   - **Build Command:** `echo "skipping build"`
    - **Run Command:** `yarn db:migrate`
 4. Under **Environment Variables**, add:
    - `NUXT_DATABASE_URL` (mark as Secret, use the same value as your web service)

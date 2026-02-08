@@ -13,6 +13,25 @@ alerts:
   - rule: DEPLOYMENT_FAILED
   - rule: DOMAIN_FAILED
 
+# App-level environment variables (inherited by all services and jobs)
+envs:
+  # Database connection - use uselibpqcompat=true for DO managed DBs
+  # Example: postgresql://user:pass@host:25060/db?sslmode=require&uselibpqcompat=true
+  - key: NUXT_DATABASE_URL
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  # Session secret for auth
+  - key: NUXT_SESSION_PASSWORD
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  # Add other environment variables as needed
+  # - key: NUXT_OAUTH_GOOGLE_CLIENT_ID
+  #   scope: RUN_AND_BUILD_TIME
+  #   value: your-client-id
+  # - key: NUXT_OAUTH_GOOGLE_CLIENT_SECRET
+  #   scope: RUN_AND_BUILD_TIME
+  #   type: SECRET
+
 services:
   - name: web
     environment_slug: node-js
@@ -20,38 +39,19 @@ services:
       branch: main
       deploy_on_push: true
       repo: your-org/your-repo
-    http_port: 3000
+    http_port: 8080
     instance_count: 1
     instance_size_slug: apps-s-1vcpu-0.5gb
-    routes:
-      - path: /
-    envs:
-      # Database connection (use a secret or reference a managed DB)
-      - key: NUXT_DATABASE_URL
-        scope: RUN_TIME
-        type: SECRET
-      # Session secret for auth
-      - key: NUXT_SESSION_SECRET
-        scope: RUN_TIME
-        type: SECRET
-      # Add other environment variables as needed
-      # - key: NUXT_OAUTH_GOOGLE_CLIENT_ID
-      #   scope: RUN_TIME
-      #   type: SECRET
-      # - key: NUXT_OAUTH_GOOGLE_CLIENT_SECRET
-      #   scope: RUN_TIME
-      #   type: SECRET
+    source_dir: /
 
 jobs:
   - name: migrate
     kind: PRE_DEPLOY
     environment_slug: node-js
     instance_size_slug: apps-s-1vcpu-0.5gb
+    build_command: echo "skipping build"
     run_command: yarn db:migrate
     github:
       branch: main
       repo: your-org/your-repo
-    envs:
-      - key: NUXT_DATABASE_URL
-        scope: RUN_TIME
-        type: SECRET
+    source_dir: /
