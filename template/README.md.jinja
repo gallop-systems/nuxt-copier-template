@@ -95,3 +95,55 @@ server/               # Backend
 
 src/volt/             # Volt UI components
 ```
+
+## Deployment
+
+### Digital Ocean App Platform
+
+An example app spec is provided at `.do/app.yaml.example`. To deploy:
+
+1. Copy `.do/app.yaml.example` to `.do/app.yaml`
+2. Update the placeholder values:
+   - `name`: Your app name
+   - `github.repo`: Your GitHub org/repo
+   - `github.branch`: Your deployment branch (usually `main`)
+3. Set up secrets in DO App Platform:
+   - `NUXT_DATABASE_URL`: Your PostgreSQL connection string
+   - `NUXT_SESSION_SECRET`: A secure random string for session signing
+{%- if include_google_oauth %}
+   - `NUXT_OAUTH_GOOGLE_CLIENT_ID`: Google OAuth client ID
+   - `NUXT_OAUTH_GOOGLE_CLIENT_SECRET`: Google OAuth client secret
+{%- endif %}
+
+The app spec includes a `PRE_DEPLOY` job that runs database migrations automatically before each deployment.
+
+#### Adding migrations via the DO UI
+
+If you're using auto-generated app specs instead of a spec file:
+
+1. Go to your app in the [DO App Platform console](https://cloud.digitalocean.com/apps)
+2. Click **Create Resource** → **Create Job**
+3. Configure the job:
+   - **Name:** `migrate`
+   - **Type:** Pre Deploy
+   - **Run Command:** `yarn db:migrate`
+4. Under **Environment Variables**, add:
+   - `NUXT_DATABASE_URL` (mark as Secret, use the same value as your web service)
+5. Click **Create and Attach**
+
+The migration job will now run before each deployment.
+
+#### Using doctl CLI
+
+To validate or apply a spec file:
+
+```bash
+# Validate the spec
+doctl apps spec validate .do/app.yaml
+
+# Create a new app from the spec
+doctl apps create --spec .do/app.yaml
+
+# Update an existing app
+doctl apps update <app-id> --spec .do/app.yaml
+```
