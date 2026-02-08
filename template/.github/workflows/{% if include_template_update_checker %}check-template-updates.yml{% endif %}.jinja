@@ -41,17 +41,17 @@ jobs:
         env:
           GH_TOKEN: ${{ '{{' }} secrets.GITHUB_TOKEN {{ '}}' }}
         run: |
-          BRANCH="chore/template-update-$(date +%Y%m%d)"
+          BRANCH="chore/template-update"
 
-          # Check if PR already exists
-          if gh pr list --head "$BRANCH" --json number --jq length | grep -q "^[1-9]"; then
+          # Check if PR already exists for this branch
+          if gh pr list --head "$BRANCH" --state open --json number --jq length | grep -q "^[1-9]"; then
             echo "PR already exists, skipping"
             exit 0
           fi
 
-          # Delete remote branch if it exists (from a previous failed run)
+          # Delete remote branch if it exists (merged/closed PR or failed run)
           if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null 2>&1; then
-            echo "Deleting existing remote branch from previous failed run"
+            echo "Deleting existing remote branch"
             git push origin --delete "$BRANCH"
           fi
 
