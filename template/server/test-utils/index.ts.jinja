@@ -44,17 +44,15 @@ export async function setupHandlerMocks() {
     };
   }
 
-  vi.stubGlobal("createError", (opts: {
-    statusCode: number;
-    message?: string;
-    statusMessage?: string;
-    data?: unknown;
-  }) => {
-    const error = new Error(opts.message || opts.statusMessage || "") as any;
-    error.statusCode = opts.statusCode;
-    if (opts.data !== undefined) error.data = opts.data;
-    return error;
-  });
+  vi.stubGlobal(
+    "createError",
+    (opts: { statusCode: number; message?: string; statusMessage?: string; data?: unknown }) => {
+      const error = new Error(opts.message || opts.statusMessage || "") as any;
+      error.statusCode = opts.statusCode;
+      if (opts.data !== undefined) error.data = opts.data;
+      return error;
+    },
+  );
 
   vi.stubGlobal("getValidatedRouterParams", async (event: any, validate: Function) => {
     return validate(event.context.params ?? {});
@@ -107,16 +105,12 @@ export function createMockEvent(options: {
   const socket = new Socket();
   const req = new IncomingMessage(socket);
   req.method = method;
-  req.url = "/" + (Object.keys(query).length
-    ? "?" + new URLSearchParams(query).toString()
-    : "");
+  req.url = "/" + (Object.keys(query).length ? "?" + new URLSearchParams(query).toString() : "");
 
   const res = new ServerResponse(req);
   const event = createEvent(req, res);
 
-  event.context.params = Object.fromEntries(
-    Object.entries(params).map(([k, v]) => [k, String(v)])
-  );
+  event.context.params = Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)]));
 
   if (body !== undefined) event.context._mockBody = body;
   if (Object.keys(query).length > 0) event.context._mockQuery = query;
@@ -150,7 +144,7 @@ export function mockDelete(params: Params) {
 
 export async function expectHttpError(
   promise: Promise<unknown>,
-  expected: { statusCode: number; message?: string }
+  expected: { statusCode: number; message?: string },
 ) {
   await expect(promise).rejects.toMatchObject(expected);
 }
@@ -163,11 +157,13 @@ function createFactories(trx: Transaction<DB>) {
   const num = () => Math.floor(Math.random() * 10000);
 
   return {
-    async user(data: Partial<{
-      email: string;
-      first_name: string;
-      last_name: string;
-    }> = {}) {
+    async user(
+      data: Partial<{
+        email: string;
+        first_name: string;
+        last_name: string;
+      }> = {},
+    ) {
       const n = num();
       return trx
         .insertInto("users")
@@ -195,18 +191,21 @@ interface TestFixtures {
 
 export const test = base.extend<TestFixtures>({
   factories: async ({}, use) => {
-    await db.transaction().execute(async (trx) => {
-      currentTrx = trx;
-      try {
-        await use(createFactories(trx));
-        throw { __rollback: true };
-      } finally {
-        currentTrx = null;
-      }
-    }).catch((e) => {
-      if (e && typeof e === "object" && "__rollback" in e) return;
-      throw e;
-    });
+    await db
+      .transaction()
+      .execute(async (trx) => {
+        currentTrx = trx;
+        try {
+          await use(createFactories(trx));
+          throw { __rollback: true };
+        } finally {
+          currentTrx = null;
+        }
+      })
+      .catch((e) => {
+        if (e && typeof e === "object" && "__rollback" in e) return;
+        throw e;
+      });
   },
 
   db: async ({ factories: _ }, use) => {

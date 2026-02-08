@@ -5,8 +5,7 @@ import pg from "pg";
 const config = useRuntimeConfig();
 
 const isLocalhost =
-  config.databaseUrl?.includes("localhost") ||
-  config.databaseUrl?.includes("127.0.0.1");
+  config.databaseUrl?.includes("localhost") || config.databaseUrl?.includes("127.0.0.1");
 
 const pool = new pg.Pool({
   connectionString: config.databaseUrl,

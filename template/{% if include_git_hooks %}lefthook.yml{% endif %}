@@ -16,6 +16,11 @@ pre-push:
       skip:
         - merge
         - rebase
+    lint:
+      run: yarn lint
+      skip:
+        - merge
+        - rebase
 
 post-merge:
   commands:

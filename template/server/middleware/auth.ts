@@ -10,14 +10,14 @@ export default defineEventHandler(async (event) => {
   const path = getRequestURL(event).pathname;
 
   if (
-    path.startsWith('/api/public/') ||
-    path.startsWith('/api/webhooks/') ||
-    path.startsWith('/api/auth/')
+    path.startsWith("/api/public/") ||
+    path.startsWith("/api/webhooks/") ||
+    path.startsWith("/api/auth/")
   ) {
     return;
   }
 
-  if (!path.startsWith('/api/')) {
+  if (!path.startsWith("/api/")) {
     return;
   }
 
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
   if (!session?.user) {
     throw createError({
       statusCode: 401,
-      message: 'Authentication required',
+      message: "Authentication required",
     });
   }
 

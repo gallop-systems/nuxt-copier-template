@@ -2,31 +2,26 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
+  compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ['nuxt-auth-utils'],
-  css: ['~/assets/css/main.css'],
-  components: [
-    { path: '~/components' },
-    { path: '../src/volt', prefix: 'Volt' },
-  ],
+  modules: ["nuxt-auth-utils"],
+  css: ["~/assets/css/main.css"],
+  components: [{ path: "~/components" }, { path: "../src/volt", prefix: "Volt" }],
   runtimeConfig: {
-    databaseUrl: '',
+    databaseUrl: "",
     session: {
-      password: '',
+      password: "",
     },
-    {% if include_google_oauth %}
+{%- if include_google_oauth %}
     oauth: {
       google: {
-        clientId: '',
-        clientSecret: '',
+        clientId: "",
+        clientSecret: "",
       },
     },
-    {% endif %}
+{%- endif %}
   },
   vite: {
-    plugins: [
-      tailwindcss(),
-    ],
+    plugins: [tailwindcss()],
   },
 });

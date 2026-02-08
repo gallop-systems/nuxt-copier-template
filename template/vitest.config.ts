@@ -27,11 +27,7 @@ export default isFrontendTest
           provider: "v8",
           reporter: ["text", "json", "json-summary"],
           include: ["server/**/*.ts"],
-          exclude: [
-            "server/**/*.test.ts",
-            "server/test-utils/**",
-            "server/db/migrations/**",
-          ],
+          exclude: ["server/**/*.test.ts", "server/test-utils/**", "server/db/migrations/**"],
         },
       },
       resolve: {

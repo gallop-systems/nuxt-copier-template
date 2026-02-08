@@ -1,0 +1,21 @@
+# Generated files
+.copier-answers.yml
+server/db/db.d.ts
+server/db/migrations/
+
+# Volt components (from volt-vue)
+src/volt/
+
+# Non-code files
+*.md
+*.yml
+*.yaml
+
+# Package files
+package.json
+yarn.lock
+
+# Build output
+.nuxt/
+.output/
+node_modules/
