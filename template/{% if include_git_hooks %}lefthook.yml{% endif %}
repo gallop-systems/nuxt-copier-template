@@ -1,3 +1,14 @@
+pre-commit:
+  commands:
+    fmt:
+      glob: "*.{ts,tsx,vue,js,jsx}"
+      run: yarn fmt
+      stage_fixed: true
+    lint:
+      glob: "*.{ts,tsx,vue,js,jsx}"
+      run: yarn lint --fix
+      stage_fixed: true
+
 pre-push:
   parallel: true
   commands:
