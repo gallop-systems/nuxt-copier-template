@@ -76,7 +76,7 @@ jobs:
           key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
           restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
       - run: yarn install --immutable
-      - run: npx nuxt typecheck
+      - run: yarn typecheck
 
   coverage:
     runs-on: ubuntu-latest

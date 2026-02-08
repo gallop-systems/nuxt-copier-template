@@ -12,7 +12,7 @@ pre-push:
         - merge
         - rebase
     typecheck:
-      run: npx nuxt typecheck
+      run: yarn typecheck
       skip:
         - merge
         - rebase
