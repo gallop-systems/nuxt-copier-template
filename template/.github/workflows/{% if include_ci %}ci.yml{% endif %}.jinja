@@ -80,6 +80,50 @@ jobs:
       - run: yarn lint
       - run: yarn fmt:check
 
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: corepack enable
+      - name: Get yarn cache directory
+        id: yarn-cache
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        with:
+          path: {% raw %}${{ steps.yarn-cache.outputs.dir }}{% endraw %}
+          key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
+          restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
+      - run: yarn install --immutable
+      - run: yarn build
+      - name: Boot the production build
+        # typecheck and tests never exercise the real `.output` server, so they
+        # miss failures that only surface there — e.g. a dependency that
+        # resolves in dev but not under the built server's native ESM loader.
+        # This boots `.output` and fails if it crashes or never starts listening.
+        run: |
+          node .output/server/index.mjs > server.log 2>&1 &
+          SERVER_PID=$!
+          for i in $(seq 1 30); do
+            if grep -q "Listening on" server.log; then
+              echo "✓ production server booted"
+              kill "$SERVER_PID" 2>/dev/null || true
+              exit 0
+            fi
+            if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+              echo "✗ production server crashed on boot:"
+              cat server.log
+              exit 1
+            fi
+            sleep 1
+          done
+          echo "✗ production server did not boot within 30s:"
+          cat server.log
+          kill "$SERVER_PID" 2>/dev/null || true
+          exit 1
+
   coverage:
     runs-on: ubuntu-latest
     needs: test
