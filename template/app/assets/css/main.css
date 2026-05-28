@@ -53,3 +53,26 @@
   --p-text-muted-color: var(--p-surface-500);
   --p-text-hover-muted-color: var(--p-surface-600);
 }
+
+/* Semantic tokens — noir dark mode (follows the OS via prefers-color-scheme,
+   matching Tailwind v4's default `dark:` variant). Primary inverts to light
+   shades so filled buttons/highlights read on dark surfaces. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --p-primary-color: var(--p-surface-0);
+    --p-primary-contrast-color: var(--p-surface-950);
+    --p-primary-hover-color: var(--p-surface-100);
+    --p-primary-active-color: var(--p-surface-200);
+    --p-content-border-color: var(--p-surface-700);
+    --p-content-hover-background: var(--p-surface-800);
+    --p-content-hover-color: var(--p-surface-0);
+    --p-highlight-background: color-mix(in srgb, var(--p-surface-0), transparent 84%);
+    --p-highlight-color: var(--p-surface-0);
+    --p-highlight-focus-background: color-mix(in srgb, var(--p-surface-0), transparent 76%);
+    --p-highlight-focus-color: var(--p-surface-0);
+    --p-text-color: var(--p-surface-0);
+    --p-text-hover-color: var(--p-surface-0);
+    --p-text-muted-color: var(--p-surface-400);
+    --p-text-hover-muted-color: var(--p-surface-300);
+  }
+}
