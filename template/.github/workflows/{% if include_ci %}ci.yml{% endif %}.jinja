@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:15
+        image: postgres:18
         env:
           POSTGRES_DB: {{ database_name }}-test
           POSTGRES_USER: postgres
@@ -77,6 +77,10 @@ jobs:
           restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
       - run: yarn install --immutable
       - run: yarn typecheck
+        env:
+          # tsc is the memory-hungry step; give Node a larger heap so the
+          # typecheck doesn't OOM on the runner as the project grows.
+          NODE_OPTIONS: --experimental-strip-types --max-old-space-size=6144
       - run: yarn lint
       - run: yarn fmt:check
 
