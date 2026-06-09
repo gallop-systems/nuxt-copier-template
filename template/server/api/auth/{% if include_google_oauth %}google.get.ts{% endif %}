@@ -23,7 +23,9 @@ export default defineOAuthGoogleEventHandler({
 
     await setUserSession(event, {
       user: {
-        id: dbUser.id,
+        // `id` is a bigint column — kysely-codegen types it as `string`; coerce
+        // to match the session User type.
+        id: Number(dbUser.id),
         email: dbUser.email,
         first_name: dbUser.first_name,
         last_name: dbUser.last_name,

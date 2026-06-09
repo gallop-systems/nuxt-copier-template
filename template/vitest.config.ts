@@ -17,6 +17,14 @@ export default isFrontendTest
       },
     })
   : defineConfig({
+      // Backend tests run as a dev-like context. Nuxt/Nitro replace
+      // `import.meta.dev` at build; under plain vitest it's undefined, which
+      // would make dev-only server guards (e.g. server/api/auth/preview-login)
+      // read as "production" and 404. Define it so those branches are exercised,
+      // not dead.
+      define: {
+        "import.meta.dev": true,
+      },
       test: {
         globals: true,
         environment: "node",

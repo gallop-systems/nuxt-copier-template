@@ -21,8 +21,7 @@ const { getInitials } = useFormatters();
 
 const initials = computed(() => {
   if (!user.value) return "";
-  const name =
-    `${(user.value as any).first_name ?? ""} ${(user.value as any).last_name ?? ""}`.trim();
+  const name = `${user.value.first_name ?? ""} ${user.value.last_name ?? ""}`.trim();
   return getInitials(name);
 });
 </script>

@@ -10,8 +10,14 @@ import { createEvent } from "h3";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
 import { db } from "../utils/db";
+import { createFactories, type Factories } from "../db/factories";
 import type { Transaction } from "kysely";
 import type { DB } from "../db/db";
+
+// Factories live in server/db/factories.ts so seeds (server/db/seeds) can share
+// the exact same row builders as tests — re-exported here for the familiar
+// `import { test, ... } from "~/server/test-utils"` surface.
+export { createFactories, type Factories };
 
 let currentTrx: Transaction<DB> | null = null;
 
@@ -148,37 +154,6 @@ export async function expectHttpError(
 ) {
   await expect(promise).rejects.toMatchObject(expected);
 }
-
-// ============================================================================
-// Factories
-// ============================================================================
-
-function createFactories(trx: Transaction<DB>) {
-  const num = () => Math.floor(Math.random() * 10000);
-
-  return {
-    async user(
-      data: Partial<{
-        email: string;
-        first_name: string;
-        last_name: string;
-      }> = {},
-    ) {
-      const n = num();
-      return trx
-        .insertInto("users")
-        .values({
-          email: data.email ?? `test${n}@example.com`,
-          first_name: data.first_name ?? "Test",
-          last_name: data.last_name ?? "User",
-        })
-        .returningAll()
-        .executeTakeFirstOrThrow();
-    },
-  };
-}
-
-export type Factories = ReturnType<typeof createFactories>;
 
 // ============================================================================
 // Test Fixture

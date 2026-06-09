@@ -12,6 +12,8 @@ yarn dev                    # Start dev server on http://localhost:3000
 yarn db:migrate             # Run migrations
 yarn db:migrate:down        # Rollback last migration
 yarn db:migrate:make <name> # Create new migration
+yarn db:seed                # Run all seeds (server/db/seeds)
+yarn db:seed:make <name>    # Create new seed file
 yarn db:codegen             # Generate TypeScript types from database
 
 # Testing
@@ -52,8 +54,35 @@ Available: VoltAvatar, VoltButton, VoltCard, VoltConfirmDialog, VoltDataTable, V
 ### Database (Kysely + PostgreSQL)
 - `server/utils/db.ts` - Database connection, exports `db` and `useDatabase()`
 - `server/db/migrations/` - Kysely migrations
+- `server/db/factories.ts` - Row builders shared by tests AND seeds (`DbLike` type)
+- `server/db/seeds/` - Seed files (run via `yarn db:seed`)
 - `server/db/db.d.ts` - Auto-generated types (via `yarn db:codegen`)
-- `kysely.config.ts` - Migration configuration
+- `kysely.config.ts` - Migration + seed configuration
+
+### Seeds (Convention)
+Seeds populate a preview/dev DB with the minimum needed to log in and work.
+
+- **Shared factories**: seeds and tests import the same row builders from
+  `server/db/factories.ts`. Tests pass a rolled-back `Transaction`; seeds pass a
+  live `Kysely` connection. Uniqueness rides a monotonic `nextSeq()` counter.
+- **Order-independent + idempotent by contract**: `kysely seed:run` runs every
+  file in `readdir` order with no ledger, so a seed must not depend on another
+  having run, and re-running must not throw or duplicate. Rows that must be
+  *stable and addressable* (the anchor login user) upsert on a natural key.
+- **Validity harness**: `server/db/seeds.harness.test.ts` runs every seed against
+  the latest migration and twice-over, catching constraint drift and
+  non-idempotency that typecheck can't see.
+
+### Preview / Dev Login
+A preview box serves on a dynamic URL that can't be a Google OAuth redirect URI,
+so it logs in via a dev-only backdoor instead:
+
+- `server/utils/preview.ts` - `PREVIEW_ANCHOR_USER` (single source of truth, also
+  seeded by `server/db/seeds`). Edit it to rebrand the anchor user.
+- `server/api/auth/preview-login.get.ts` - establishes a session as that user.
+  Double-gated on `import.meta.dev` (compile-time, dead in prod builds) **and**
+  `NUXT_PREVIEW_MODE` (runtime). The `/login` button only appears when the
+  matching `public.previewMode` runtime flag is on.
 
 ### Backend Testing (Transaction Rollback Pattern)
 Tests use real PostgreSQL with automatic transaction rollback for isolation.

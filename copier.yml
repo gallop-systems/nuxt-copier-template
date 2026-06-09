@@ -65,6 +65,9 @@ _tasks:
     when: "{{ _copier_operation == 'copy' }}"
   - command: "bash -c 'set -a && source .env && set +a && yarn db:codegen'"
     when: "{{ _copier_operation == 'copy' }}"
+  # Seed the anchor login user (enables preview/dev login)
+  - command: "bash -c 'set -a && source .env && set +a && yarn db:seed'"
+    when: "{{ _copier_operation == 'copy' }}"
   # Initialize git repo (must come before lefthook install)
   - command: "git init && git add -A && git commit -m 'Initial scaffold from gallop-template'"
     when: "{{ _copier_operation == 'copy' }}"

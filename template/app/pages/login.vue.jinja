@@ -18,6 +18,13 @@
 {%- endraw %}
 {%- endif %}
 {%- raw %}
+      <VoltSecondaryButton
+        v-if="previewMode"
+        label="Sign in as preview user"
+        icon="pi pi-eye"
+        class="w-full"
+        @click="signInAsPreviewUser"
+      />
     </div>
   </div>
 {%- endraw %}
@@ -29,6 +36,14 @@ definePageMeta({
 });
 
 const projectName = "{{ project_name }}";
+
+// Only true inside a preview box (see nuxt.config public.previewMode). Surfaces
+// the dev-mode preview-login button; the endpoint is gated on the same flag.
+const previewMode = useRuntimeConfig().public.previewMode;
+
+function signInAsPreviewUser() {
+  navigateTo("/api/auth/preview-login", { external: true });
+}
 {%- if include_google_oauth %}
 
 function signInWithGoogle() {

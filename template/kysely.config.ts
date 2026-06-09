@@ -11,4 +11,7 @@ export default defineConfig({
   migrations: {
     migrationFolder: "server/db/migrations",
   },
+  seeds: {
+    seedFolder: "server/db/seeds",
+  },
 });
