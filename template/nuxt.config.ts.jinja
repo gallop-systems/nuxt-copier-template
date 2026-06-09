@@ -20,6 +20,13 @@ export default defineNuxtConfig({
       },
     },
 {%- endif %}
+    public: {
+      // True only inside a preview box (NUXT_PREVIEW_MODE set at serve time).
+      // Reveals the preview-login button on /login; the backing endpoint
+      // (server/api/auth/preview-login.get.ts) is itself gated on the same env
+      // var, so this flag is just UI. Read from process.env at config eval.
+      previewMode: !!process.env.NUXT_PREVIEW_MODE,
+    },
   },
   vite: {
     plugins: [tailwindcss()],
