@@ -123,27 +123,40 @@ See `DESIGN_LANGUAGE.md` for the complete design system. Key points:
 - **Semantic colors only** - Emerald for success, red for danger
 - **No decorative shadows** - Only on hover for interactivity
 - **Icons** - PrimeIcons (`pi pi-*` classes)
+
+## Agent Skills
+
+This project depends on `@gallopsystems/agent-skills`, which symlinks Claude Code
+skills into `.claude/skills/` on every `yarn install`. Check there before solving
+a problem from scratch — the skills that matter here:
+
+- `kysely-postgres` - query patterns, migrations, type generation
+- `nuxt-nitro-api` - API handlers, validation, auth, SSR
+- `nitro-testing` - the transaction-rollback test harness used in this repo
+- `git-github` - branch/PR workflow, debugging failed Actions runs
+- `doctl` - DigitalOcean deployments and logs
+- `copier-template` - applying template updates (see below)
+
+If `.claude/skills/` is missing, run `yarn install`. To pick up newer skills:
+`yarn up @gallopsystems/agent-skills`.
 {% if include_template_update_checker %}
 ## Template Updates
 
-This project was scaffolded from [gallop-systems/nuxt-copier-template](https://github.com/gallop-systems/nuxt-copier-template).
+This project was scaffolded from [gallop-systems/nuxt-copier-template](https://github.com/gallop-systems/nuxt-copier-template). The version it's on is recorded in `.copier-answers.yml` (`_commit`) — never edit that file by hand.
 
-The `.github/workflows/check-template-updates.yml` workflow runs daily to check for upstream template changes. When updates are available, it automatically opens a PR with instructions.
+The `.github/workflows/check-template-updates.yml` workflow runs daily and, when the template has a newer tag, opens a PR (branch `chore/template-update`) whose body contains step-by-step instructions.
 
-To apply template updates:
+To apply an update, follow the `copier-template` skill (`applying-updates.md` has the full conflict-resolution procedure). The short version:
+
 ```bash
-# Checkout the PR branch
-git checkout chore/template-update-YYYYMMDD
-git pull
+git checkout chore/template-update && git pull
+uvx copier update --trust --defaults
 
-# Apply updates
-copier update --trust
+# resolve conflict markers and *.rej files, then validate
+yarn install && yarn typecheck && yarn lint && yarn fmt:check && yarn test:run
 
-# Review changes, commit, and push
-git add -A
-git commit -m "chore: apply template updates"
+git add -A   # must include .copier-answers.yml
+git commit -m "chore: update to template vX.Y.Z"
 git push
 ```
-
-The PR includes a link to view what changed in the template since your last update.
 {% endif %}
