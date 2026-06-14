@@ -5,6 +5,29 @@
 /* Ensure Tailwind scans Volt component sources for class names */
 @source "../../../src/volt";
 
+/* Semantic surface tokens (zinc-first). Write `bg-surface`, `text-fg`,
+   `border-line` ONCE — they flip automatically under prefers-color-scheme
+   (see the dark override below). This is what makes dark mode un-forgettable:
+   there is no `dark:` half to omit.
+
+   Use these for YOUR app markup (pages, components). Volt components stay on
+   the `surface-*` scale + `dark:` pairs — that's a vendored, full-ramp system
+   you keep updatable; these tokens are a small, opinionated app vocabulary.
+   Light values here; dark values in the @media block near the bottom. */
+@theme {
+  --color-canvas: #fafafa; /* zinc-50  — app background */
+  --color-surface: #ffffff; /* white    — cards, panels, dialogs */
+  --color-surface-muted: #fafafa; /* zinc-50  — subtle fills, row hover */
+  --color-line: #e4e4e7; /* zinc-200 — borders */
+  --color-line-soft: #f4f4f5; /* zinc-100 — soft dividers */
+  --color-fg: #18181b; /* zinc-900 — primary text */
+  --color-fg-muted: #71717a; /* zinc-500 — secondary text */
+  --color-fg-subtle: #a1a1aa; /* zinc-400 — tertiary text */
+  --color-accent: #18181b; /* zinc-900 — inverted/primary fills (buttons) */
+  --color-on-accent: #ffffff; /* text/icon on an accent fill */
+  --color-fill: #e4e4e7; /* zinc-200 — neutral solid fills: avatars, tracks, dots, skeletons */
+}
+
 /* Primary palette (zinc) */
 :root {
   --p-primary-50: #fafafa;
@@ -59,6 +82,21 @@
    shades so filled buttons/highlights read on dark surfaces. */
 @media (prefers-color-scheme: dark) {
   :root {
+    /* Semantic surface tokens — dark values (override the light defaults above).
+       fg-muted / fg-subtle are lifted off a strict mirror-invert for legibility
+       on near-black. */
+    --color-canvas: #09090b; /* zinc-950 */
+    --color-surface: #18181b; /* zinc-900 */
+    --color-surface-muted: #27272a; /* zinc-800 */
+    --color-line: #27272a; /* zinc-800 */
+    --color-line-soft: #27272a; /* zinc-800 */
+    --color-fg: #f4f4f5; /* zinc-100 */
+    --color-fg-muted: #b4b4bc; /* secondary — ~9:1 on near-black */
+    --color-fg-subtle: #8c8c95; /* tertiary  — ~5.5:1 on near-black */
+    --color-accent: #f4f4f5; /* zinc-100 — inverts so filled buttons read on dark */
+    --color-on-accent: #18181b; /* zinc-900 */
+    --color-fill: #3f3f46; /* zinc-700 — reads as a raised surface on dark */
+
     --p-primary-color: var(--p-surface-0);
     --p-primary-contrast-color: var(--p-surface-950);
     --p-primary-hover-color: var(--p-surface-100);
