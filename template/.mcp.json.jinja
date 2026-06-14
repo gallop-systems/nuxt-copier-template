@@ -1,0 +1,17 @@
+{#
+  Project-scoped MCP servers, auto-discovered by Claude Code. On first use it
+  prompts to approve each server (run /mcp to manage / authenticate).
+
+  All three below are core to this stack, so none are gated. To add a server that
+  depends on a copier question, wrap it like:
+    {% raw %}{% if include_foo %}, "foo": { "type": "http", "url": "..." }{% endif %}{% endraw %}
+  For stdio servers needing secrets, reference env vars Claude Code expands at
+  read time, e.g. "env": { "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}" }.
+#}
+{
+  "mcpServers": {
+    "nuxt": { "type": "http", "url": "https://nuxt.com/mcp" },
+    "vue": { "type": "http", "url": "https://mcp.vue-mcp.org/mcp" },
+    "primevue": { "type": "stdio", "command": "npx", "args": ["-y", "@primevue/mcp"] }
+  }
+}
