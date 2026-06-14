@@ -51,6 +51,28 @@ After answering, Copier automatically:
 6. Generates TypeScript types from the database schema
 7. Initializes a git repo with an initial commit
 
+## Requiring CI to pass before merge
+
+GitHub does **not** read required status checks from committed workflow files —
+branch protection is configured on the repo, so a fresh project starts with
+nothing gating merges. After pushing the repo to GitHub (and letting CI run once
+so the check is known), require the CI gate on `main`:
+
+```bash
+echo '{"required_status_checks":{"strict":false,"contexts":["ci-success"]},"enforce_admins":false,"required_pull_request_reviews":null,"restrictions":null}' \
+  | gh api -X PUT repos/{owner}/{repo}/branches/main/protection --input -
+```
+
+Require the single **`ci-success`** context, not the individual jobs. The backend
+test job is sharded, so its check names embed the shard count (`test (shard
+1/4)`, …) and change as the suite grows — pinning protection to them would break.
+`ci-success` is a stable aggregate that passes only when every gating job
+(`test`, `test-frontend`, `typecheck`, `static`, `build`) succeeds. The
+`coverage` job is intentionally excluded so it never blocks a merge.
+
+Requires admin on the repo and the `include_ci` workflow. Add
+`"required_pull_request_reviews"` or other fields if you also want review rules.
+
 ## Updating an existing project
 
 When the template evolves, pull changes into a project that was scaffolded from it:
