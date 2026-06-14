@@ -24,6 +24,7 @@ const theme = ref<AvatarPassThroughOptions>({
     root: `inline-flex items-center justify-center
         w-8 h-8 text-base rounded-md
         bg-surface-200 dark:bg-surface-700
+        text-surface-700 dark:text-surface-0
         has-[img]:bg-transparent
         p-circle:rounded-full
         p-large:w-12 p-large:h-12 p-large:text-2xl
