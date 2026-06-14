@@ -11,8 +11,8 @@
    there is no `dark:` half to omit.
 
    Use these for YOUR app markup (pages, components). Volt components stay on
-   the `surface-*` scale + `dark:` pairs — that's a vendored, full-ramp system
-   you keep updatable; these tokens are a small, opinionated app vocabulary.
+   the `surface-*` scale + `dark:` pairs — they need the full 0–950 ramp; these
+   tokens are a small, opinionated app vocabulary, not a replacement for it.
    Light values here; dark values in the @media block near the bottom. */
 @theme {
   --color-canvas: #fafafa; /* zinc-50  — app background */
