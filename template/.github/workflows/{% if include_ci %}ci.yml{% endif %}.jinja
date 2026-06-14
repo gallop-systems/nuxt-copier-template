@@ -256,3 +256,25 @@ jobs:
           " >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Total: ${COVERAGE}% line coverage**" >> $GITHUB_STEP_SUMMARY
+
+  # Stable aggregate gate. The sharded `test` job's check names include the shard
+  # total (e.g. "test (shard 1/4)"), which changes as the suite grows — so they
+  # can't be used as required status checks. Require THIS single context in
+  # branch protection instead; it passes only if every gating job did.
+  # `needs.test.result` rolls the whole matrix into one result, so this stays
+  # correct regardless of shard count. `coverage` is intentionally excluded so it
+  # stays non-blocking.
+  ci-success:
+    name: ci-success
+    if: always()
+    needs: [shard-plan, test, test-frontend, typecheck, static, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all required jobs succeeded
+        run: |
+          results="{% raw %}${{ join(needs.*.result, ' ') }}{% endraw %}"
+          echo "gating job results: $results"
+          for r in $results; do
+            [ "$r" = "success" ] || { echo "✗ a required job failed or was skipped"; exit 1; }
+          done
+          echo "✓ all required jobs succeeded"
