@@ -12,8 +12,37 @@ permissions:
   checks: write
 
 jobs:
-  test:
+  # Size the backend test matrix to the suite: ~40 test files per shard, capped.
+  # Per-shard cost is ~60s fixed overhead + ~2s/test-file and the `build` job
+  # floors the gate at a few minutes, so sharding finer than ~50 files/shard buys
+  # no gate improvement. A fresh project with a handful of tests gets a single
+  # shard (1/1) and pays no fan-out overhead; the count grows on its own.
+  shard-plan:
     runs-on: ubuntu-latest
+    outputs:
+      shards: {% raw %}${{ steps.plan.outputs.shards }}{% endraw %}
+    steps:
+      - uses: actions/checkout@v4
+      - id: plan
+        run: |
+          count=$(find server -name '*.test.ts' | wc -l | tr -d ' ')
+          per=40  # target test files per shard
+          max=6   # don't fan out wider than this regardless of suite size
+          total=$(( (count + per - 1) / per ))
+          [ "$total" -lt 1 ] && total=1
+          [ "$total" -gt "$max" ] && total=$max
+          shards=$(seq 1 "$total" | jq -R . | jq -cs .)
+          echo "shards=$shards" >> "$GITHUB_OUTPUT"
+          echo "Planned $total shard(s) for $count backend test files"
+
+  test:
+    name: test (shard {% raw %}${{ matrix.shard }}/${{ strategy.job-total }}{% endraw %})
+    runs-on: ubuntu-latest
+    needs: shard-plan
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: {% raw %}${{ fromJSON(needs.shard-plan.outputs.shards) }}{% endraw %}
     services:
       postgres:
         image: postgres:18
@@ -43,23 +72,40 @@ jobs:
           key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
           restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
       - run: yarn install --immutable
-      - name: Run backend tests with coverage
-        run: yarn test --coverage
+      - name: Run backend tests (shard {% raw %}${{ matrix.shard }}/${{ strategy.job-total }}{% endraw %})
+        # No --coverage on the critical path: shards run fast and gate the merge.
+        # Coverage is produced off the critical path in the `coverage` job below.
+        # Each matrix leg gets its own isolated postgres service, so shards never
+        # contend on the database — the transaction-rollback fixture keeps tests
+        # within a shard isolated too.
+        run: yarn test:run --shard={% raw %}${{ matrix.shard }}/${{ strategy.job-total }}{% endraw %}
         env:
           TEST_POSTGRESQL_CONNECTION_STRING: postgres://postgres:postgres@localhost:5432/{{ database_name }}-test
           NODE_OPTIONS: --experimental-strip-types
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: corepack enable
+      - name: Get yarn cache directory
+        id: yarn-cache
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        with:
+          path: {% raw %}${{ steps.yarn-cache.outputs.dir }}{% endraw %}
+          key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
+          restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
+      - run: yarn install --immutable
       - name: Run frontend tests
         run: yarn test:frontend:run
         env:
           NODE_OPTIONS: --experimental-strip-types
-      - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage
-          path: coverage/
-          retention-days: 7
 
-  lint:
+  typecheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -81,6 +127,26 @@ jobs:
           # tsc is the memory-hungry step; give Node a larger heap so the
           # typecheck doesn't OOM on the runner as the project grows.
           NODE_OPTIONS: --experimental-strip-types --max-old-space-size=6144
+
+  # oxlint + oxfmt are Rust-fast (sub-second). Kept separate from `typecheck` so
+  # a lint or format failure surfaces in seconds instead of waiting behind tsc.
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: corepack enable
+      - name: Get yarn cache directory
+        id: yarn-cache
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        with:
+          path: {% raw %}${{ steps.yarn-cache.outputs.dir }}{% endraw %}
+          key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
+          restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
+      - run: yarn install --immutable
       - run: yarn lint
       - run: yarn fmt:check
 
@@ -128,17 +194,46 @@ jobs:
           kill "$SERVER_PID" 2>/dev/null || true
           exit 1
 
+  # Coverage is an afterthought, not a gate: this job runs the full backend suite
+  # with --coverage off the critical path (PR-only) so it never blocks or slows a
+  # merge. Do NOT add it to required status checks.
   coverage:
     runs-on: ubuntu-latest
-    needs: test
     if: {% raw %}github.event_name == 'pull_request'{% endraw %}
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: {{ database_name }}-test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
-      - name: Download coverage artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/setup-node@v4
         with:
-          name: coverage
-          path: coverage/
+          node-version: '22'
+      - run: corepack enable
+      - name: Get yarn cache directory
+        id: yarn-cache
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        with:
+          path: {% raw %}${{ steps.yarn-cache.outputs.dir }}{% endraw %}
+          key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
+          restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
+      - run: yarn install --immutable
+      - name: Run backend tests with coverage
+        run: yarn test:run --coverage
+        env:
+          TEST_POSTGRESQL_CONNECTION_STRING: postgres://postgres:postgres@localhost:5432/{{ database_name }}-test
+          NODE_OPTIONS: --experimental-strip-types
       - name: Coverage Report on PR
         uses: davelosert/vitest-coverage-report-action@v2
         with:
@@ -161,3 +256,25 @@ jobs:
           " >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Total: ${COVERAGE}% line coverage**" >> $GITHUB_STEP_SUMMARY
+
+  # Stable aggregate gate. The sharded `test` job's check names include the shard
+  # total (e.g. "test (shard 1/4)"), which changes as the suite grows — so they
+  # can't be used as required status checks. Require THIS single context in
+  # branch protection instead; it passes only if every gating job did.
+  # `needs.test.result` rolls the whole matrix into one result, so this stays
+  # correct regardless of shard count. `coverage` is intentionally excluded so it
+  # stays non-blocking.
+  ci-success:
+    name: ci-success
+    if: always()
+    needs: [shard-plan, test, test-frontend, typecheck, static, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all required jobs succeeded
+        run: |
+          results="{% raw %}${{ join(needs.*.result, ' ') }}{% endraw %}"
+          echo "gating job results: $results"
+          for r in $results; do
+            [ "$r" = "success" ] || { echo "✗ a required job failed or was skipped"; exit 1; }
+          done
+          echo "✓ all required jobs succeeded"
