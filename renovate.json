@@ -1,0 +1,25 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "semanticCommits": "enabled",
+  "semanticCommitType": "fix",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Bump npm dependency pins inside the copier-templated package.json.jinja",
+      "managerFilePatterns": ["/^template/package\\.json\\.jinja$/"],
+      "matchStrings": [
+        "\"(?<depName>@?[a-z0-9][\\w.\\/-]*)\":\\s*\"(?<currentValue>[\\^~]\\d+\\.\\d+\\.\\d+[^\"]*)\""
+      ],
+      "datasourceTemplate": "npm"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Auto-merge the agent-skills bump so it lands without a manual PR merge; release-please then cuts the patch.",
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["@gallopsystems/agent-skills"],
+      "automerge": true
+    }
+  ]
+}
