@@ -88,23 +88,17 @@ Copier diffs the template version you originally copied against the latest tagge
 
 ## Versioning
 
-Copier uses git tags to track template versions. Every time you make a meaningful change to the template, tag and release:
+Copier uses git tags to track template versions, and **[release-please](https://github.com/googleapis/release-please) automates them** — you don't tag by hand. Land changes on `main` with [Conventional Commit](https://www.conventionalcommits.org/) messages and release-please opens/maintains a release PR; **merging that PR cuts the `vX.Y.Z` tag + GitHub Release**. The version bump is inferred from the commits:
 
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-gh release create v0.1.0 --title "v0.1.0" --notes "- Your changes here"
-```
+- `fix:` / dependency bumps → **patch** (`v0.1.1`)
+- `feat:` / new questions / new optional components → **minor** (`v0.2.0`)
+- a `!` or `BREAKING CHANGE:` footer → **major** (`v1.0.0`)
 
-Use [semver](https://semver.org/):
+Dependencies (including `@gallopsystems/agent-skills`) are bumped automatically by **Renovate** (see `renovate.json`) as `fix(deps):` commits, so a dependency update flows straight to a patch release with no manual step — which the descendant update checker / template-update sweep then propagates.
 
-- **Patch** (`v0.1.1`): bug fixes, dependency bumps
-- **Minor** (`v0.2.0`): new features, new questions, new optional components
-- **Major** (`v1.0.0`): breaking changes to project structure or configuration
+Creating a GitHub Release (release-please does this) — not just a tag — matters because downstream projects with the template update checker link to release notes in their update PRs.
 
-Creating a GitHub release (not just a tag) is important because downstream projects with the template update checker will link to release notes in their update PRs.
-
-Without tags, `copier copy` will warn "No git tags found in template" and `copier update` won't work in downstream projects.
+Without tags, `copier copy` warns "No git tags found in template" and `copier update` won't work in downstream projects.
 
 ## Testing the template
 
@@ -154,4 +148,4 @@ Files ending in `.jinja` are processed by Copier's Jinja2 engine. Filenames can 
 
 1. Make changes in the `template/` directory (or `copier.yml` for questions/tasks)
 2. Run `./test.sh` to verify the template still produces a working project
-3. Commit, then tag a new version so downstream projects can `copier update`
+3. Commit with a Conventional Commit message and open a PR; once merged, release-please cuts the new version so downstream projects can `copier update` (see [Versioning](#versioning))
