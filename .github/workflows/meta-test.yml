@@ -15,12 +15,15 @@ permissions:
   contents: read
 
 env:
-  # Yarn 4 auto-enables "hardened mode" on public-PR CI, which forbids CREATING a
-  # lockfile — but the scaffold's first `yarn install` is what creates it (the
-  # generated project has no yarn.lock yet). Safe to opt out here: this is our own
-  # first-party template, and downstream `--immutable` installs still validate the
-  # lockfile the scaffold produced.
+  # The scaffold's first `yarn install` must CREATE the project's lockfile (the
+  # freshly generated project has none yet). Two Yarn-4 CI defaults forbid that
+  # and must be disabled: hardened mode (auto-on for public-PR CI) and immutable
+  # installs (auto-on whenever $CI is set — which is why this only bites in CI,
+  # not locally). Safe here: this is our own first-party template, and the
+  # downstream jobs pass `--immutable` on the CLI (which overrides this env), so
+  # they still validate the lockfile the scaffold produced.
   YARN_ENABLE_HARDENED_MODE: "0"
+  YARN_ENABLE_IMMUTABLE_INSTALLS: "false"
 
 jobs:
   scaffold:
