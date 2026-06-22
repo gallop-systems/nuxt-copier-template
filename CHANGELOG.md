@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.15.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.15.0...v1.15.1) (2026-06-22)
+
+
+### Bug Fixes
+
+* disable Renovate's copier manager in descendant config ([92465cc](https://github.com/gallop-systems/nuxt-copier-template/commit/92465cc109954ea811133849e0e514deb6942691))
+* disable Renovate's copier manager in the descendant config ([0bdfb3a](https://github.com/gallop-systems/nuxt-copier-template/commit/0bdfb3a3fcd7255360703b687c7e6cd708d851d7))
+
 ## [1.15.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.14.1...v1.15.0) (2026-06-22)
 
 
