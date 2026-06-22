@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.16.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.15.3...v1.16.0) (2026-06-22)
+
+
+### Features
+
+* make auth a provider choice (google/microsoft/none) ([638f618](https://github.com/gallop-systems/nuxt-copier-template/commit/638f618a626ad49f000571ec36286c4fba5fc3b6))
+* make auth a provider choice (google/microsoft/none) ([fee65a4](https://github.com/gallop-systems/nuxt-copier-template/commit/fee65a4abf1155411a42a5a7579c323f0636fc8f))
+
+
+### Continuous Integration
+
+* keep engines.node and .nvmrc in lockstep via Renovate ([717deae](https://github.com/gallop-systems/nuxt-copier-template/commit/717deaeb7161bdde91f2979ebecb8b112d888234))
+
 ## [1.15.3](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.15.2...v1.15.3) (2026-06-22)
 
 
