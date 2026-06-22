@@ -15,6 +15,11 @@
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "description": "Bump the kysely ecosystem as one PR. kysely 0.x minors are breaking and kysely-ctl/kysely-codegen pin a kysely range, so splitting them lands a kysely the migration CLI can't import.",
+      "matchPackageNames": ["kysely", "kysely-ctl", "kysely-codegen"],
+      "groupName": "kysely"
     }
   ]
 }
