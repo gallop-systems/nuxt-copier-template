@@ -55,7 +55,7 @@ jobs:
           node-version: "22"
       - run: corepack enable
       - name: Install uv (for uvx copier)
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v8.2.0
       - name: Install postgresql-client (createdb/dropdb in the scaffold tasks)
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
       - name: Git identity (the scaffold tasks make an initial commit)
