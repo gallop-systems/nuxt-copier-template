@@ -7,7 +7,7 @@
  * seed can import it while running in the bare `kysely seed:run` context (no
  * Nitro auto-imports).
  *
- * Background: a preview box can't use Google OAuth — its URL is dynamic and
+ * Background: a preview box can't use OAuth — its URL is dynamic and
  * can't be a pre-registered redirect URI — so preview login is a dev-mode
  * backdoor that establishes a session as this seeded user. Both the backdoor
  * endpoint and the runtimeConfig flag that reveals it are hard-gated on

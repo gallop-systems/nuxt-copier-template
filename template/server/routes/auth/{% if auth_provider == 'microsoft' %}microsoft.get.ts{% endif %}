@@ -1,0 +1,70 @@
+import { decideOAuthStateAction, resolveMicrosoftSignIn } from "../../utils/microsoft-auth";
+
+const STATE_COOKIE = "ms-oauth-state";
+const STATE_PATH = "/auth/microsoft";
+
+const microsoftHandler = defineOAuthMicrosoftEventHandler({
+  config: {
+    scope: ["openid", "profile", "email", "User.Read"],
+  },
+  async onSuccess(event, { user: msUser }) {
+    const result = await resolveMicrosoftSignIn(useDatabase(), msUser);
+
+    if (!result.ok) {
+      if (result.error === "no_email") {
+        throw createError({
+          statusCode: 400,
+          message: "No email found in Microsoft account",
+        });
+      }
+      return sendRedirect(event, `/login?error=${result.error}`);
+    }
+
+    await setUserSession(event, { user: result.user });
+
+    return sendRedirect(event, "/");
+  },
+  onError(event, error) {
+    console.error("Microsoft OAuth error:", error);
+    return sendRedirect(event, "/login?error=auth_failed");
+  },
+});
+
+/**
+ * nuxt-auth-utils' Microsoft provider forwards `state` to Microsoft but does
+ * not validate it on the callback (unlike its other providers), leaving the
+ * flow open to OAuth login CSRF. We wrap it: mint a state, store it in a
+ * cookie, re-enter so the provider forwards it, and reject any callback whose
+ * returned state doesn't match. All token/redirect work is left to the
+ * provider so the computed redirect_uri stays consistent across both legs.
+ */
+export default defineEventHandler((event) => {
+  const query = getQuery(event);
+  const action = decideOAuthStateAction(
+    { code: query.code, error: query.error, state: query.state },
+    getCookie(event, STATE_COOKIE),
+  );
+
+  if (action === "mint") {
+    const state = crypto.randomUUID();
+    setCookie(event, STATE_COOKIE, state, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: !import.meta.dev,
+      path: STATE_PATH,
+      maxAge: 600,
+    });
+    return sendRedirect(event, `${STATE_PATH}?state=${state}`);
+  }
+
+  if (action === "reject") {
+    deleteCookie(event, STATE_COOKIE, { path: STATE_PATH });
+    return sendRedirect(event, "/login?error=auth_failed");
+  }
+
+  // Clear the one-time state cookie before the provider exchanges the code.
+  if (query.code) {
+    deleteCookie(event, STATE_COOKIE, { path: STATE_PATH });
+  }
+  return microsoftHandler(event);
+});

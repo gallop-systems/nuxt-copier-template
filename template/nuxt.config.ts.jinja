@@ -12,11 +12,19 @@ export default defineNuxtConfig({
     session: {
       password: "",
     },
-{%- if include_google_oauth %}
+{%- if auth_provider == 'google' %}
     oauth: {
       google: {
         clientId: "",
         clientSecret: "",
+      },
+    },
+{%- elif auth_provider == 'microsoft' %}
+    oauth: {
+      microsoft: {
+        clientId: "",
+        clientSecret: "",
+        tenant: "",
       },
     },
 {%- endif %}

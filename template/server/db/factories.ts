@@ -31,6 +31,7 @@ export function createFactories(trx: DbLike) {
         email: string;
         first_name: string;
         last_name: string;
+        deactivated_at: Date | string | null;
       }> = {},
     ) {
       const num = nextSeq();
@@ -40,6 +41,7 @@ export function createFactories(trx: DbLike) {
           email: data.email ?? `test${num}@example.com`,
           first_name: data.first_name ?? "Test",
           last_name: data.last_name ?? "User",
+          deactivated_at: data.deactivated_at ?? null,
         })
         .returningAll()
         .executeTakeFirstOrThrow();

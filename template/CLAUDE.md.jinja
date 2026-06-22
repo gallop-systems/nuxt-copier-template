@@ -74,7 +74,7 @@ Seeds populate a preview/dev DB with the minimum needed to log in and work.
   non-idempotency that typecheck can't see.
 
 ### Preview / Dev Login
-A preview box serves on a dynamic URL that can't be a Google OAuth redirect URI,
+A preview box serves on a dynamic URL that can't be a pre-registered OAuth redirect URI,
 so it logs in via a dev-only backdoor instead:
 
 - `server/utils/preview.ts` - `PREVIEW_ANCHOR_USER` (single source of truth, also

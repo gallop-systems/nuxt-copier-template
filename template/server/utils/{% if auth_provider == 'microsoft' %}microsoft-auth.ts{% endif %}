@@ -1,0 +1,125 @@
+import type { Kysely, Selectable } from "kysely";
+import { sql } from "kysely";
+import type { DB, Users } from "../db/db";
+
+/** The subset of the Microsoft Graph `/me` profile we rely on. */
+export interface MicrosoftProfile {
+  mail?: string | null;
+  userPrincipalName?: string | null;
+  givenName?: string | null;
+  surname?: string | null;
+}
+
+export interface SessionUser {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+}
+
+export type MicrosoftSignInResult =
+  | { ok: true; user: SessionUser }
+  | { ok: false; error: "no_email" | "account_deactivated" };
+
+export type OAuthStateAction = "mint" | "delegate" | "reject";
+
+/**
+ * Decides how the Microsoft route should treat a request, given the query and
+ * the state we previously stored in a cookie. Pure so it can be unit-tested
+ * without the OAuth/h3 machinery.
+ *
+ * - "mint": first hit with no state — issue a state and re-enter.
+ * - "delegate": hand off to the provider (re-entry with state, or a verified
+ *   success callback).
+ * - "reject": an error callback (cancel/deny), or a success callback whose
+ *   state is missing or does not match — send the user back to /login.
+ */
+export function decideOAuthStateAction(
+  query: { code?: unknown; error?: unknown; state?: unknown },
+  expectedState: string | undefined,
+): OAuthStateAction {
+  // Callback from Microsoft carries either a `code` (success) or an `error`
+  // (the user cancelled or consent failed); both echo back our `state`.
+  if (query.code || query.error) {
+    if (query.error) {
+      return "reject";
+    }
+    if (!expectedState || query.state !== expectedState) {
+      return "reject";
+    }
+    return "delegate";
+  }
+
+  // Not a callback: the first hit has no state and must mint one; the
+  // re-entry already carries state and is handed off to the provider.
+  return query.state ? "delegate" : "mint";
+}
+
+function toSessionUser(user: Selectable<Users>): SessionUser {
+  return {
+    id: Number(user.id),
+    email: user.email,
+    first_name: user.first_name,
+    last_name: user.last_name,
+  };
+}
+
+/**
+ * Resolves a Microsoft profile into a session user, auto-provisioning the
+ * account on first sign-in. Rejects profiles without an email and users whose
+ * account has been deactivated, so a deactivated user cannot regain access via
+ * SSO. The handler maps the result to a session or a redirect; keeping this
+ * logic separate makes it unit-testable.
+ */
+export async function resolveMicrosoftSignIn(
+  db: Kysely<DB>,
+  profile: MicrosoftProfile,
+): Promise<MicrosoftSignInResult> {
+  const email = (profile.mail || profile.userPrincipalName)?.toLowerCase();
+  if (!email) {
+    return { ok: false, error: "no_email" };
+  }
+
+  const firstName = profile.givenName || "";
+  const lastName = profile.surname || "";
+
+  // Match existing users case-insensitively. The email column is plain text
+  // with a case-sensitive unique constraint, so an onConflict("email") upsert
+  // alone would miss a row stored with different casing and insert a duplicate
+  // active user — which, if the original row was deactivated, would bypass the
+  // deactivation check below.
+  const existing = await db
+    .selectFrom("users")
+    .selectAll()
+    .where(sql<string>`lower(email)`, "=", email)
+    .executeTakeFirst();
+
+  if (existing) {
+    if (existing.deactivated_at) {
+      return { ok: false, error: "account_deactivated" };
+    }
+    const updated = await db
+      .updateTable("users")
+      .set({ email, first_name: firstName, last_name: lastName, updated_at: new Date() })
+      .where("id", "=", existing.id)
+      .returningAll()
+      .executeTakeFirstOrThrow();
+    return { ok: true, user: toSessionUser(updated) };
+  }
+
+  // No existing account: provision one. The onConflict keeps concurrent
+  // first-logins (same lowercased email) safe — they update rather than error.
+  const created = await db
+    .insertInto("users")
+    .values({ email, first_name: firstName, last_name: lastName })
+    .onConflict((oc) =>
+      oc.column("email").doUpdateSet({
+        first_name: firstName,
+        last_name: lastName,
+        updated_at: new Date(),
+      }),
+    )
+    .returningAll()
+    .executeTakeFirstOrThrow();
+  return { ok: true, user: toSessionUser(created) };
+}

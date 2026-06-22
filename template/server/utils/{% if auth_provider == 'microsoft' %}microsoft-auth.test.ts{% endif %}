@@ -1,0 +1,149 @@
+import { sql } from "kysely";
+import { describe, test, expect } from "~/server/test-utils";
+import { decideOAuthStateAction, resolveMicrosoftSignIn } from "./microsoft-auth";
+
+describe("decideOAuthStateAction", () => {
+  test("mints a state on the first hit (no code, no state)", () => {
+    expect(decideOAuthStateAction({}, undefined)).toBe("mint");
+  });
+
+  test("delegates the re-entry that already carries a state", () => {
+    expect(decideOAuthStateAction({ state: "abc" }, "abc")).toBe("delegate");
+  });
+
+  test("delegates a success callback whose state matches the cookie", () => {
+    expect(decideOAuthStateAction({ code: "xyz", state: "abc" }, "abc")).toBe("delegate");
+  });
+
+  test("rejects a success callback whose state does not match", () => {
+    expect(decideOAuthStateAction({ code: "xyz", state: "abc" }, "different")).toBe("reject");
+  });
+
+  test("rejects a success callback when no state cookie is present", () => {
+    expect(decideOAuthStateAction({ code: "xyz", state: "abc" }, undefined)).toBe("reject");
+  });
+
+  test("rejects an error callback (e.g. user cancelled) instead of restarting", () => {
+    expect(decideOAuthStateAction({ error: "access_denied", state: "abc" }, "abc")).toBe("reject");
+  });
+});
+
+describe("resolveMicrosoftSignIn", () => {
+  test("auto-provisions a new user from the Microsoft profile", async ({ db }) => {
+    const result = await resolveMicrosoftSignIn(db, {
+      mail: "Alice@Example.com",
+      givenName: "Alice",
+      surname: "Smith",
+    });
+
+    expect(result).toMatchObject({
+      ok: true,
+      user: { email: "alice@example.com", first_name: "Alice", last_name: "Smith" },
+    });
+
+    const row = await db
+      .selectFrom("users")
+      .selectAll()
+      .where("email", "=", "alice@example.com")
+      .executeTakeFirst();
+    expect(row?.first_name).toBe("Alice");
+    expect(row?.last_name).toBe("Smith");
+  });
+
+  test("falls back to userPrincipalName and lowercases the email", async ({ db }) => {
+    const result = await resolveMicrosoftSignIn(db, {
+      mail: null,
+      userPrincipalName: "Bob@Example.com",
+      givenName: "Bob",
+      surname: "Jones",
+    });
+
+    expect(result).toMatchObject({ ok: true, user: { email: "bob@example.com" } });
+  });
+
+  test("updates the name of an existing user instead of duplicating", async ({ db, factories }) => {
+    await factories.user({ email: "carol@example.com", first_name: "Carol", last_name: "Old" });
+
+    const result = await resolveMicrosoftSignIn(db, {
+      mail: "carol@example.com",
+      givenName: "Carol",
+      surname: "New",
+    });
+
+    expect(result).toMatchObject({ ok: true, user: { last_name: "New" } });
+
+    const rows = await db
+      .selectFrom("users")
+      .select(["last_name"])
+      .where("email", "=", "carol@example.com")
+      .execute();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.last_name).toBe("New");
+  });
+
+  test("matches an existing user stored with different email casing", async ({ db, factories }) => {
+    await factories.user({ email: "Eve@Example.com", first_name: "Eve", last_name: "Old" });
+
+    const result = await resolveMicrosoftSignIn(db, {
+      mail: "eve@example.com",
+      givenName: "Eve",
+      surname: "New",
+    });
+
+    expect(result).toMatchObject({
+      ok: true,
+      user: { email: "eve@example.com", last_name: "New" },
+    });
+
+    // No duplicate row, and the stored casing is normalized.
+    const rows = await db
+      .selectFrom("users")
+      .select(["email"])
+      .where(sql<string>`lower(email)`, "=", "eve@example.com")
+      .execute();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.email).toBe("eve@example.com");
+  });
+
+  test("rejects a deactivated user even when stored email casing differs", async ({
+    db,
+    factories,
+  }) => {
+    await factories.user({ email: "Frank@Example.com", deactivated_at: new Date() });
+
+    const result = await resolveMicrosoftSignIn(db, {
+      mail: "frank@example.com",
+      givenName: "Frank",
+      surname: "Gone",
+    });
+
+    expect(result).toEqual({ ok: false, error: "account_deactivated" });
+
+    // The deactivated row must not have been duplicated into a new active user.
+    const rows = await db
+      .selectFrom("users")
+      .select(["deactivated_at"])
+      .where(sql<string>`lower(email)`, "=", "frank@example.com")
+      .execute();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.deactivated_at).not.toBeNull();
+  });
+
+  test("rejects a profile with no email", async ({ db }) => {
+    const result = await resolveMicrosoftSignIn(db, { givenName: "No", surname: "Email" });
+
+    expect(result).toEqual({ ok: false, error: "no_email" });
+  });
+
+  test("rejects a deactivated user without issuing a session", async ({ db, factories }) => {
+    await factories.user({ email: "dave@example.com", deactivated_at: new Date() });
+
+    const result = await resolveMicrosoftSignIn(db, {
+      mail: "dave@example.com",
+      givenName: "Dave",
+      surname: "Gone",
+    });
+
+    expect(result).toEqual({ ok: false, error: "account_deactivated" });
+  });
+});
