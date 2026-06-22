@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.15.2](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.15.1...v1.15.2) (2026-06-22)
+
+
+### Bug Fixes
+
+* import kysely migration symbols from kysely/migration (0.29) ([695533e](https://github.com/gallop-systems/nuxt-copier-template/commit/695533e81aaf0227e3b5e415b715a63db27e6a81))
+* move kysely to 0.29 with its ecosystem; group kysely in Renovate ([f68eebc](https://github.com/gallop-systems/nuxt-copier-template/commit/f68eebcfc85e96c8e22f04e64cdc3ef786749dca))
+* move kysely to 0.29 with its ecosystem; group kysely in Renovate ([ae6be1e](https://github.com/gallop-systems/nuxt-copier-template/commit/ae6be1e0fa8a26e516ed0ae5ab69dcd029a47704))
+
 ## [1.15.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.15.0...v1.15.1) (2026-06-22)
 
 
