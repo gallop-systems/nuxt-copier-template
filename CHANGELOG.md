@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.14.1...v1.15.0) (2026-06-22)
+
+
+### Features
+
+* ship Renovate into descendant repos (own deps; agent-skills template-owned; 2-week cooldown) ([64066bd](https://github.com/gallop-systems/nuxt-copier-template/commit/64066bd17574bcd32bcd2da9a00c18e18608bb52))
+
 ## [1.14.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.14.0...v1.14.1) (2026-06-22)
 
 
