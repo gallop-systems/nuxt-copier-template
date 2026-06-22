@@ -39,6 +39,11 @@ include_template_update_checker:
   help: "Include workflow to check for template updates?"
   default: true
 
+include_renovate:
+  type: bool
+  help: "Include Renovate config so this repo keeps its own dependencies fresh?"
+  default: true
+
 # Post-generation tasks
 _tasks:
   # Create databases

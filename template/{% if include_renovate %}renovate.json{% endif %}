@@ -1,0 +1,19 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":maintainLockFilesWeekly"],
+  "minimumReleaseAge": "2 weeks",
+  "internalChecksFilter": "strict",
+  "packageRules": [
+    {
+      "description": "@gallopsystems/agent-skills is owned by the template and delivered via `copier update` (the template's Renovate bumps it, auto-merges, and cuts a release). This repo must NOT bump it, or the two fight on every template update.",
+      "matchPackageNames": ["@gallopsystems/agent-skills"],
+      "enabled": false
+    },
+    {
+      "description": "Auto-merge devDependency minor/patch updates once CI passes — they rarely touch runtime and the ci-success gate guards them.",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    }
+  ]
+}
