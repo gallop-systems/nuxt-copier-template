@@ -3,6 +3,7 @@
   "extends": ["config:recommended", ":maintainLockFilesWeekly"],
   "minimumReleaseAge": "2 weeks",
   "internalChecksFilter": "strict",
+  "copier": { "enabled": false },
   "packageRules": [
     {
       "description": "@gallopsystems/agent-skills is owned by the template and delivered via `copier update` (the template's Renovate bumps it, auto-merges, and cuts a release). This repo must NOT bump it, or the two fight on every template update.",
