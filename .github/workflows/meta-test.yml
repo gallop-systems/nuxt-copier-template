@@ -52,7 +52,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
       - run: corepack enable
       - name: Install uv (for uvx copier)
         uses: astral-sh/setup-uv@v8.2.0
@@ -99,7 +99,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
       - run: corepack enable
       - uses: actions/download-artifact@v8
         with:
@@ -134,7 +134,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
       - run: corepack enable
       - uses: actions/download-artifact@v8
         with:
@@ -157,7 +157,7 @@ jobs:
       - uses: actions/checkout@v7 # for bin/smoke.sh
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
       - run: corepack enable
       - uses: actions/download-artifact@v8
         with:
