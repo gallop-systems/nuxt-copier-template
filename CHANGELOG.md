@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.15.3](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.15.2...v1.15.3) (2026-06-22)
+
+
+### Bug Fixes
+
+* pin scaffold engines.node so DO deploys match .nvmrc ([054104e](https://github.com/gallop-systems/nuxt-copier-template/commit/054104e10635091a0da667115b2305b93ec408d0))
+* pin scaffold engines.node so DO deploys match .nvmrc ([a6fdef0](https://github.com/gallop-systems/nuxt-copier-template/commit/a6fdef0c9aad0a51fbec6898f364c15c22217307))
+
 ## [1.15.2](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.15.1...v1.15.2) (2026-06-22)
 
 
