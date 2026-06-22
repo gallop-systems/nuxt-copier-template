@@ -9,7 +9,7 @@
 - **UI Components:** [Volt](https://volt.primevue.org/) (PrimeVue + Tailwind)
 - **Database:** PostgreSQL with [Kysely](https://kysely.dev/) (type-safe query builder)
 - **Validation:** [Zod](https://zod.dev/)
-- **Auth:** [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils) (session-based{% if include_google_oauth %}, Google OAuth{% endif %})
+- **Auth:** [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils) (session-based{% if auth_provider == 'google' %}, Google OAuth{% elif auth_provider == 'microsoft' %}, Microsoft OAuth{% endif %})
 - **Testing:** [Vitest](https://vitest.dev/) with transaction-based DB isolation
 - **Package Manager:** Yarn 4
 - **Node:** 22+
@@ -34,8 +34,11 @@ Copy `.env.example` to `.env` and fill in the values:
 |---|---|
 | `NUXT_DATABASE_URL` | PostgreSQL connection string |
 | `NUXT_SESSION_PASSWORD` | Secret for signing session cookies |
-{% if include_google_oauth %}| `NUXT_OAUTH_GOOGLE_CLIENT_ID` | Google OAuth client ID |
+{% if auth_provider == 'google' %}| `NUXT_OAUTH_GOOGLE_CLIENT_ID` | Google OAuth client ID |
 | `NUXT_OAUTH_GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+{% elif auth_provider == 'microsoft' %}| `NUXT_OAUTH_MICROSOFT_CLIENT_ID` | Microsoft (Entra ID) OAuth client ID |
+| `NUXT_OAUTH_MICROSOFT_TENANT` | Microsoft (Entra ID) tenant ID |
+| `NUXT_OAUTH_MICROSOFT_CLIENT_SECRET` | Microsoft (Entra ID) OAuth client secret |
 {% endif %}
 ## Database
 
@@ -110,9 +113,13 @@ An example app spec is provided at `.do/app.yaml.example`. To deploy:
 3. Set up secrets in DO App Platform:
    - `NUXT_DATABASE_URL`: Your PostgreSQL connection string (see note below)
    - `NUXT_SESSION_PASSWORD`: A secure random string for session signing
-{%- if include_google_oauth %}
+{%- if auth_provider == 'google' %}
    - `NUXT_OAUTH_GOOGLE_CLIENT_ID`: Google OAuth client ID
    - `NUXT_OAUTH_GOOGLE_CLIENT_SECRET`: Google OAuth client secret
+{%- elif auth_provider == 'microsoft' %}
+   - `NUXT_OAUTH_MICROSOFT_CLIENT_ID`: Microsoft (Entra ID) OAuth client ID
+   - `NUXT_OAUTH_MICROSOFT_TENANT`: Microsoft (Entra ID) tenant ID
+   - `NUXT_OAUTH_MICROSOFT_CLIENT_SECRET`: Microsoft (Entra ID) OAuth client secret
 {%- endif %}
 
 **Important:** For DO managed PostgreSQL databases, add `uselibpqcompat=true` to your connection string to avoid SSL certificate issues:

@@ -25,12 +25,24 @@ envs:
     scope: RUN_AND_BUILD_TIME
     type: SECRET
   # Add other environment variables as needed
-  # - key: NUXT_OAUTH_GOOGLE_CLIENT_ID
-  #   scope: RUN_AND_BUILD_TIME
-  #   value: your-client-id
-  # - key: NUXT_OAUTH_GOOGLE_CLIENT_SECRET
-  #   scope: RUN_AND_BUILD_TIME
-  #   type: SECRET
+{%- if auth_provider == 'google' %}
+  - key: NUXT_OAUTH_GOOGLE_CLIENT_ID
+    scope: RUN_AND_BUILD_TIME
+    value: your-client-id
+  - key: NUXT_OAUTH_GOOGLE_CLIENT_SECRET
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+{%- elif auth_provider == 'microsoft' %}
+  - key: NUXT_OAUTH_MICROSOFT_CLIENT_ID
+    scope: RUN_AND_BUILD_TIME
+    value: your-client-id
+  - key: NUXT_OAUTH_MICROSOFT_TENANT
+    scope: RUN_AND_BUILD_TIME
+    value: your-tenant-id
+  - key: NUXT_OAUTH_MICROSOFT_CLIENT_SECRET
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+{%- endif %}
 
 services:
   - name: web

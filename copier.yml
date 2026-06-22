@@ -19,10 +19,16 @@ database_name:
   help: "PostgreSQL database name"
   default: "{{ project_name }}"
 
-include_google_oauth:
-  type: bool
-  help: "Include Google OAuth config?"
-  default: true
+auth_provider:
+  type: str
+  help: "Which auth provider should the app scaffold? (google / microsoft / none)"
+  choices:
+    Google OAuth: google
+    Microsoft OAuth (Entra ID): microsoft
+    None (session infra + preview login only): none
+  # Migrates existing repos on `copier update`: the old bool answer is still in
+  # context (true -> google, false -> none); fresh copies default to google.
+  default: "{{ 'google' if include_google_oauth | default(true) else 'none' }}"
 
 include_ci:
   type: bool

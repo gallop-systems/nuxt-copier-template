@@ -7,13 +7,22 @@
         <p class="mt-2 text-sm text-fg-muted">Sign in to continue</p>
       </div>
 {%- endraw %}
-{%- if include_google_oauth %}
+{%- if auth_provider == 'google' %}
 {%- raw %}
       <VoltButton
         label="Sign in with Google"
         icon="pi pi-google"
         class="w-full"
         @click="signInWithGoogle"
+      />
+{%- endraw %}
+{%- elif auth_provider == 'microsoft' %}
+{%- raw %}
+      <VoltButton
+        label="Sign in with Microsoft"
+        icon="pi pi-microsoft"
+        class="w-full"
+        @click="signInWithMicrosoft"
       />
 {%- endraw %}
 {%- endif %}
@@ -44,10 +53,15 @@ const previewMode = useRuntimeConfig().public.previewMode;
 function signInAsPreviewUser() {
   navigateTo("/api/auth/preview-login", { external: true });
 }
-{%- if include_google_oauth %}
+{%- if auth_provider == 'google' %}
 
 function signInWithGoogle() {
   navigateTo("/api/auth/google", { external: true });
+}
+{%- elif auth_provider == 'microsoft' %}
+
+function signInWithMicrosoft() {
+  navigateTo("/auth/microsoft", { external: true });
 }
 {%- endif %}
 </script>

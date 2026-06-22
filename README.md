@@ -37,7 +37,7 @@ You'll be prompted for:
 | `project_name` | *(required)* | Used in package.json, DB names, page headers |
 | `project_description` | `""` | For package.json |
 | `database_name` | same as `project_name` | PostgreSQL database name |
-| `include_google_oauth` | `true` | Add Google OAuth login flow |
+| `auth_provider` | `google` | Auth provider to scaffold: `google`, `microsoft`, or `none` |
 | `include_ci` | `true` | Add GitHub Actions CI workflow |
 | `include_git_hooks` | `true` | Add lefthook pre-commit hooks |
 
