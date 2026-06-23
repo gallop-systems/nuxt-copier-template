@@ -71,7 +71,6 @@ jobs:
             --data auth_provider=microsoft \
             --data include_ci=false \
             --data include_git_hooks=false \
-            --data include_template_update_checker=false \
             . /tmp/scaffold
       - name: Package the scaffold for the check jobs (sans node_modules)
         # db.d.ts (codegen output) and the volt components ARE source → included,

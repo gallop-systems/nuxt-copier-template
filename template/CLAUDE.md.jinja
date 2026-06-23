@@ -144,12 +144,10 @@ If `.claude/skills/` is missing, run `yarn install`. To pick up newer skills:
 knot that no installed skill covers (or one contradicts), offer to upstream it:
 "Want me to contribute this back to the skills repo?" If yes, run
 `/contribute-skill`.
-{% if include_template_update_checker %}
+
 ## Template Updates
 
 This project was scaffolded from [gallop-systems/nuxt-copier-template](https://github.com/gallop-systems/nuxt-copier-template). The version it's on is recorded in `.copier-answers.yml` (`_commit`) — never edit that file by hand.
-
-The `.github/workflows/check-template-updates.yml` workflow runs daily and, when the template has a newer tag, opens a PR (branch `chore/template-update`) whose body contains step-by-step instructions.
 
 To apply an update, follow the `copier-template` skill (`applying-updates.md` has the full conflict-resolution procedure). The short version:
 
@@ -164,4 +162,3 @@ git add -A   # must include .copier-answers.yml
 git commit -m "chore: update to template vX.Y.Z"
 git push
 ```
-{% endif %}
