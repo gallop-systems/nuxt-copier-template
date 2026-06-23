@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.16.0...v1.16.1) (2026-06-23)
+
+
+### Continuous Integration
+
+* trim scaffolded CI to cut Actions minutes ([a119b00](https://github.com/gallop-systems/nuxt-copier-template/commit/a119b00ffbffd10abaa103132f648c8d01b81086))
+* trim scaffolded CI to cut Actions minutes ([8c27b27](https://github.com/gallop-systems/nuxt-copier-template/commit/8c27b27d41d5c8c141b65ff444f6355ea1e9d224))
+
 ## [1.16.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.15.3...v1.16.0) (2026-06-22)
 
 
