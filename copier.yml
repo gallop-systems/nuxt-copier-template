@@ -34,11 +34,6 @@ include_git_hooks:
   help: "Include lefthook git hooks?"
   default: true
 
-include_template_update_checker:
-  type: bool
-  help: "Include workflow to check for template updates?"
-  default: true
-
 include_renovate:
   type: bool
   help: "Include Renovate config so this repo keeps its own dependencies fresh?"

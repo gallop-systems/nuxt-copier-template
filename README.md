@@ -94,9 +94,9 @@ Copier uses git tags to track template versions, and **[release-please](https://
 - `feat:` / new questions / new optional components → **minor** (`v0.2.0`)
 - a `!` or `BREAKING CHANGE:` footer → **major** (`v1.0.0`)
 
-Dependencies (including `@gallopsystems/agent-skills`) are bumped automatically by **Renovate** (see `renovate.json`) as `fix(deps):` commits, so a dependency update flows straight to a patch release with no manual step — which the descendant update checker / template-update sweep then propagates.
+Dependencies (including `@gallopsystems/agent-skills`) are bumped automatically by **Renovate** (see `renovate.json`) as `fix(deps):` commits, so a dependency update flows straight to a patch release with no manual step — which the template-update sweep then propagates.
 
-Creating a GitHub Release (release-please does this) — not just a tag — matters because downstream projects with the template update checker link to release notes in their update PRs.
+Creating a GitHub Release (release-please does this) — not just a tag — matters because downstream projects link to release notes when applying template updates.
 
 Without tags, `copier copy` warns "No git tags found in template" and `copier update` won't work in downstream projects.
 

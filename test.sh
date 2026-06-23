@@ -29,7 +29,6 @@ uvx copier copy --trust --defaults --vcs-ref HEAD \
   --data include_google_oauth=false \
   --data include_ci=false \
   --data include_git_hooks=false \
-  --data include_template_update_checker=false \
   . "$SCAFFOLD_DIR"
 
 cd "$SCAFFOLD_DIR"
