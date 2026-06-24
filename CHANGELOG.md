@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.2](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.16.1...v1.16.2) (2026-06-24)
+
+
+### Code Refactoring
+
+* **template:** replace raw sql lower(email) with typed eb.fn ([36b2ff7](https://github.com/gallop-systems/nuxt-copier-template/commit/36b2ff7e8db5f4239589b4beef5e50864eb703e9))
+* **template:** replace raw sql lower(email) with typed eb.fn ([329ac4d](https://github.com/gallop-systems/nuxt-copier-template/commit/329ac4d30dc9ad6c7f970c87f477b2c88aada84f))
+
 ## [1.16.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.16.0...v1.16.1) (2026-06-23)
 
 
