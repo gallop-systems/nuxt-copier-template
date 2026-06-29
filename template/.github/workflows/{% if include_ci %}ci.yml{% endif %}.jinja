@@ -1,4 +1,4 @@
-name: CI
+{% if ci_runner == 'self-hosted' %}{% set runner = '[self-hosted, gallop-ci]' %}{% else %}{% set runner = 'ubuntu-latest' %}{% endif %}name: CI
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
   # no gate improvement. A fresh project with a handful of tests gets a single
   # shard (1/1) and pays no fan-out overhead; the count grows on its own.
   shard-plan:
-    runs-on: ubuntu-latest
+    runs-on: {{ runner }}
     outputs:
       shards: {% raw %}${{ steps.plan.outputs.shards }}{% endraw %}
     steps:
@@ -45,7 +45,7 @@ jobs:
 
   test:
     name: test (shard {% raw %}${{ matrix.shard }}/${{ strategy.job-total }}{% endraw %})
-    runs-on: ubuntu-latest
+    runs-on: {{ runner }}
     needs: shard-plan
     strategy:
       fail-fast: false
@@ -98,7 +98,7 @@ jobs:
   # here — `build` (the other heavy job) stays separate so the two 6GB-heap steps
   # (typecheck + build) don't serialize and stretch the gate.
   checks:
-    runs-on: ubuntu-latest
+    runs-on: {{ runner }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -128,7 +128,7 @@ jobs:
           NODE_OPTIONS: --experimental-strip-types
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: {{ runner }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -183,7 +183,7 @@ jobs:
     name: ci-success
     if: always()
     needs: [shard-plan, test, checks, build]
-    runs-on: ubuntu-latest
+    runs-on: {{ runner }}
     steps:
       - name: Verify all required jobs succeeded
         run: |
