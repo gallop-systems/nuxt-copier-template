@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.17.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.17.0...v1.17.1) (2026-06-29)
+
+
+### Bug Fixes
+
+* **template:** exclude .claude/worktrees from dev file-watchers ([b86e83d](https://github.com/gallop-systems/nuxt-copier-template/commit/b86e83d4f29b7680b33d62219d7515f191af8be1))
+* **template:** exclude .claude/worktrees from dev file-watchers ([f4cc05a](https://github.com/gallop-systems/nuxt-copier-template/commit/f4cc05a82ec5238b68cc93e3f89d20d025ffb8cd))
+
 ## [1.17.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.16.2...v1.17.0) (2026-06-29)
 
 
