@@ -45,7 +45,16 @@ export default defineNuxtConfig({
       previewMode: !!process.env.NUXT_PREVIEW_MODE,
     },
   },
+  // Keep dev file-watchers out of agent worktrees. Each `.claude/worktrees/*`
+  // has its own node_modules; without this the watcher recurses into all of
+  // them and exhausts the process file-descriptor limit (EMFILE on `nuxt dev`).
+  ignore: ["**/.claude/worktrees/**"],
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      watch: {
+        ignored: ["**/.claude/worktrees/**"],
+      },
+    },
   },
 });
