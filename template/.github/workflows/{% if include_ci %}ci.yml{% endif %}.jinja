@@ -20,37 +20,18 @@ permissions:
   checks: write
 
 jobs:
-  # Size the backend test matrix to the suite: ~40 test files per shard, capped.
-  # Per-shard cost is ~60s fixed overhead + ~2s/test-file and the `build` job
-  # floors the gate at a few minutes, so sharding finer than ~50 files/shard buys
-  # no gate improvement. A fresh project with a handful of tests gets a single
-  # shard (1/1) and pays no fan-out overhead; the count grows on its own.
-  shard-plan:
-    runs-on: {{ runner }}
-    outputs:
-      shards: {% raw %}${{ steps.plan.outputs.shards }}{% endraw %}
-    steps:
-      - uses: actions/checkout@v4
-      - id: plan
-        run: |
-          count=$(find server -name '*.test.ts' | wc -l | tr -d ' ')
-          per=40  # target test files per shard
-          max=6   # don't fan out wider than this regardless of suite size
-          total=$(( (count + per - 1) / per ))
-          [ "$total" -lt 1 ] && total=1
-          [ "$total" -gt "$max" ] && total=$max
-          shards=$(seq 1 "$total" | jq -R . | jq -cs .)
-          echo "shards=$shards" >> "$GITHUB_OUTPUT"
-          echo "Planned $total shard(s) for $count backend test files"
-
+  # Backend tests. No sharding: Vitest already parallelizes the suite across
+  # worker threads within this one job, so on the self-hosted multi-core runner
+  # it uses all available cores — splitting across machines would only add
+  # per-shard install/checkout overhead. (On the github-hosted option it's a
+  # single 2-core job, still fine for a young suite.)
   test:
-    name: test (shard {% raw %}${{ matrix.shard }}/${{ strategy.job-total }}{% endraw %})
     runs-on: {{ runner }}
-    needs: shard-plan
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: {% raw %}${{ fromJSON(needs.shard-plan.outputs.shards) }}{% endraw %}
+    # Run in a container so the postgres service attaches to a private per-job
+    # network and is reachable by its label hostname (`postgres`) — no host-port
+    # mapping, so concurrent jobs on a shared self-hosted runner host never
+    # collide on 5432. Works identically on github-hosted runners.
+    container: node:22
     services:
       postgres:
         image: postgres:18
@@ -58,8 +39,6 @@ jobs:
           POSTGRES_DB: {{ database_name }}-test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -67,9 +46,6 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
       - run: corepack enable
       - name: Get yarn cache directory
         id: yarn-cache
@@ -80,15 +56,16 @@ jobs:
           key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
           restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
       - run: yarn install --immutable
-      - name: Run backend tests (shard {% raw %}${{ matrix.shard }}/${{ strategy.job-total }}{% endraw %})
-        # No --coverage on the critical path: shards run fast and gate the merge.
-        # Each matrix leg gets its own isolated postgres service, so shards never
-        # contend on the database — the transaction-rollback fixture keeps tests
-        # within a shard isolated too. To read coverage, run `yarn test:run
-        # --coverage` locally; it's intentionally not a CI job (see git history).
-        run: yarn test:run --shard={% raw %}${{ matrix.shard }}/${{ strategy.job-total }}{% endraw %}
+      - name: Run backend tests
+        # Vitest parallelizes across worker threads within this one job. No
+        # --coverage on the critical path; run `yarn test:run --coverage`
+        # locally (intentionally not a CI job — see git history).
+        run: yarn test:run
         env:
-          TEST_POSTGRESQL_CONNECTION_STRING: postgres://postgres:postgres@localhost:5432/{{ database_name }}-test
+          # `postgres` = the service label, resolvable on the per-job network.
+          # sslmode=disable: the service speaks no SSL and isn't on localhost, so
+          # opt out explicitly (see server/utils/db.ts).
+          TEST_POSTGRESQL_CONNECTION_STRING: postgres://postgres:postgres@postgres:5432/{{ database_name }}-test?sslmode=disable
           NODE_OPTIONS: --experimental-strip-types
 
   # Everything that doesn't touch the database, behind a SINGLE `yarn install`.
@@ -147,6 +124,10 @@ jobs:
       - run: yarn build
         env:
           NODE_OPTIONS: --experimental-strip-types --max-old-space-size=6144
+          # This build is only boot-tested below, never shipped — skip the slow
+          # server-sourcemap generation. Deploy builds don't set this, so they
+          # keep server sourcemaps for Sentry (see nuxt.config.ts).
+          NUXT_CI_BUILD: '1'
       - name: Boot the production build
         # typecheck and tests never exercise the real `.output` server, so they
         # miss failures that only surface there — e.g. a dependency that
@@ -173,16 +154,13 @@ jobs:
           kill "$SERVER_PID" 2>/dev/null || true
           exit 1
 
-  # Stable aggregate gate. The sharded `test` job's check names include the shard
-  # total (e.g. "test (shard 1/4)"), which changes as the suite grows — so they
-  # can't be used as required status checks. Require THIS single context in
-  # branch protection instead; it passes only if every gating job did.
-  # `needs.test.result` rolls the whole matrix into one result, so this stays
-  # correct regardless of shard count.
+  # Stable aggregate gate to require in branch protection; passes only if every
+  # gating job did. Require THIS single context (not the individual jobs) so the
+  # required-checks list never has to change as jobs are added or renamed.
   ci-success:
     name: ci-success
     if: always()
-    needs: [shard-plan, test, checks, build]
+    needs: [test, checks, build]
     runs-on: {{ runner }}
     steps:
       - name: Verify all required jobs succeeded
