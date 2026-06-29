@@ -101,10 +101,10 @@ hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-200/50 transition-all
 
 <!-- Header icon -->
 <VoltAvatar
-  icon="pi pi-users"
-  pt:root:class="w-11 h-11 rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-950"
-  pt:icon:class="text-white"
-/>
+  pt:root:class="w-11 h-11 rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-950 text-white"
+>
+  <template #icon><Icon name="lucide:users" /></template>
+</VoltAvatar>
 ```
 
 ### Tags/Badges
@@ -160,7 +160,7 @@ hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-200/50 transition-all
       @click="closeCallback"
       class="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors"
     >
-      <i class="pi pi-times text-zinc-600 text-sm" />
+      <Icon name="lucide:x" class="text-zinc-600 text-sm" />
     </button>
   </template>
 </VoltDialog>
@@ -170,7 +170,7 @@ hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-200/50 transition-all
 
 ```vue
 <button class="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors">
-  <i class="pi pi-chevron-right text-zinc-600 text-sm" />
+  <Icon name="lucide:chevron-right" class="text-zinc-600 text-sm" />
 </button>
 ```
 
@@ -201,7 +201,7 @@ hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-200/50 transition-all
   to="/parent"
   class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors"
 >
-  <i class="pi pi-chevron-left text-zinc-600" />
+  <Icon name="lucide:chevron-left" class="text-zinc-600" />
 </NuxtLink>
 ```
 
@@ -222,19 +222,69 @@ hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-200/50 transition-all
 
 ## Icons
 
-Use [PrimeIcons](https://primevue.org/icons/) with `pi pi-*` classes:
+Use [Lucide](https://lucide.dev/icons/) via `@nuxt/icon`'s `<Icon>` component.
+Icons are bundled offline (no runtime API calls) — see `nuxt.config.ts`.
 
-```html
-<i class="pi pi-users" />
-<i class="pi pi-plus" />
-<i class="pi pi-chevron-left" />
-<i class="pi pi-chevron-right" />
-<i class="pi pi-times" />
-<i class="pi pi-pencil" />
-<i class="pi pi-trash" />
-<i class="pi pi-search" />
-<i class="pi pi-spin pi-spinner" />  <!-- Loading -->
+```vue
+<Icon name="lucide:users" />
+<Icon name="lucide:plus" />
+<Icon name="lucide:chevron-left" />
+<Icon name="lucide:chevron-right" />
+<Icon name="lucide:x" />
+<Icon name="lucide:pencil" />
+<Icon name="lucide:trash-2" />
+<Icon name="lucide:search" />
+<Icon name="lucide:loader-circle" class="animate-spin" />  <!-- Loading -->
 ```
+
+- Icons render at `1em` and inherit `currentColor`, so size/color them with
+  Tailwind utilities (`text-zinc-500`, `size-4`) like any text.
+- **Use static, literal `name` values.** Offline bundling relies on
+  `clientBundle.scan` (see `nuxt.config.ts`), which scans the source for
+  `<Icon name="...">` with string literals. A computed name
+  (`:name="iconFor(row)"`) is **not** scanned — it won't be bundled and will
+  silently fall back to a network fetch (and break offline). If you must pick an
+  icon dynamically, list every possible value explicitly in
+  `icon.clientBundle.icons` in `nuxt.config.ts`.
+- Lucide is monochrome and has **no brand logos**. For brand marks (OAuth
+  buttons, etc.) use the `simple-icons` set, which also tints with
+  `currentColor`: `<Icon name="simple-icons:google" />`.
+- For a PrimeVue/Volt component that takes an icon, pass it via the `#icon`
+  slot rather than the `icon` prop:
+
+  ```vue
+  <VoltButton label="Sign in with Google" @click="signIn">
+    <template #icon><Icon name="simple-icons:google" /></template>
+  </VoltButton>
+  ```
+
+---
+
+## Motion
+
+Animation is deliberately minimal. Two tools cover almost everything:
+
+- **`transition-colors`** (Tailwind) for hover/active state changes — already
+  the norm across buttons, cards, and inputs.
+- **PrimeVue's built-in transitions** for overlays (Dialog, Drawer, Toast,
+  Menu) — no extra work needed.
+
+For DOM changes that aren't covered above — list rows being added/removed,
+conditional fields appearing, panels expanding — use **AutoAnimate**. The
+`v-auto-animate` directive is registered globally; drop it on the parent:
+
+```vue
+<ul v-auto-animate>
+  <li v-for="row in rows" :key="row.id">{{ row.name }}</li>
+</ul>
+```
+
+Keep motion in service of clarity, not decoration:
+
+- Only animate layout changes (add / remove / move / show / hide).
+- Keep it subtle — default duration is fine; don't slow it down.
+- No entrance/scroll/spring flourishes. If an app genuinely needs a marketing
+  surface, add a motion library to *that* app locally rather than here.
 
 ---
 
@@ -246,3 +296,4 @@ Use [PrimeIcons](https://primevue.org/icons/) with `pi pi-*` classes:
 - Don't use borders between table rows
 - Don't use blue/purple accent colors - stick to zinc
 - Don't use the default Volt component styles without customization
+- Don't add decorative entrance/scroll/spring animations — use AutoAnimate only for layout changes

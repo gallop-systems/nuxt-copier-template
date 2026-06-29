@@ -4,8 +4,17 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["nuxt-auth-utils", "@vueuse/nuxt"],
+  modules: ["nuxt-auth-utils", "@vueuse/nuxt", "@nuxt/icon"],
   css: ["~/assets/css/main.css"],
+  // Icons are fully offline + bundled — no runtime Iconify API calls.
+  // Sets ship in the locally installed @iconify-json/* packages (lucide for
+  // general icons, simple-icons for brand marks). serverBundle covers SSR;
+  // clientBundle.scan walks the source for <Icon name="..."> and bundles only
+  // the icons actually used into the client.
+  icon: {
+    serverBundle: { collections: ["lucide", "simple-icons"] },
+    clientBundle: { scan: true },
+  },
   components: [{ path: "~/components" }, { path: "../src/volt", prefix: "Volt" }],
   runtimeConfig: {
     databaseUrl: "",
