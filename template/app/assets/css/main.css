@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tailwindcss-primeui";
-@import "primeicons/primeicons.css";
 
 /* Ensure Tailwind scans Volt component sources for class names */
 @source "../../../src/volt";
