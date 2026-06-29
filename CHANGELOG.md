@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.17.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.16.2...v1.17.0) (2026-06-29)
+
+
+### Features
+
+* **template:** add AutoAnimate and migrate icons to Lucide ([7d2b025](https://github.com/gallop-systems/nuxt-copier-template/commit/7d2b025a13f707495c4995c38982c653c29c01ea))
+* **template:** add AutoAnimate and migrate icons to Lucide ([2f15237](https://github.com/gallop-systems/nuxt-copier-template/commit/2f152379d010adfe94bb5bcc8f97d91eff09b735))
+
 ## [1.16.2](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.16.1...v1.16.2) (2026-06-24)
 
 
