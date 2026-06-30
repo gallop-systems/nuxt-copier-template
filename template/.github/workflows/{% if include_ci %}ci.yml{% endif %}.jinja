@@ -124,31 +124,40 @@ jobs:
       - run: yarn build
         env:
           NODE_OPTIONS: --experimental-strip-types --max-old-space-size=6144
-      - name: Boot the production build
+      - name: Boot and render-check the production build
         # typecheck and tests never exercise the real `.output` server, so they
-        # miss failures that only surface there — e.g. a dependency that
-        # resolves in dev but not under the built server's native ESM loader.
-        # This boots `.output` and fails if it crashes or never starts listening.
+        # miss failures that only surface there — e.g. a dependency that resolves
+        # in dev but not under the built server's native ESM loader. Crucially
+        # those often 500 at *render* time, not at boot: the server listens fine,
+        # then errors when a page is actually requested. So: boot, wait for it to
+        # listen, then render the home route and fail on a 5xx. Boot-only misses
+        # render failures entirely.
         run: |
           node .output/server/index.mjs > server.log 2>&1 &
           SERVER_PID=$!
+          # 1) wait for it to listen (fail fast if it crashes on boot)
           for i in $(seq 1 30); do
-            if grep -q "Listening on" server.log; then
-              echo "✓ production server booted"
-              kill "$SERVER_PID" 2>/dev/null || true
-              exit 0
-            fi
+            grep -q "Listening on" server.log && break
             if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-              echo "✗ production server crashed on boot:"
-              cat server.log
-              exit 1
+              echo "✗ production server crashed on boot:"; cat server.log; exit 1
             fi
             sleep 1
           done
-          echo "✗ production server did not boot within 30s:"
-          cat server.log
+          if ! grep -q "Listening on" server.log; then
+            echo "✗ production server did not boot within 30s:"; cat server.log
+            kill "$SERVER_PID" 2>/dev/null || true; exit 1
+          fi
+          echo "✓ booted; render-checking the home route"
+          # 2) render a real route — a 5xx means the server served an error page
+          # instead of rendering (the gap boot-only misses). 2xx/3xx/4xx are fine.
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 http://localhost:3000/ || echo 000)
+          echo "  GET / -> $code"
           kill "$SERVER_PID" 2>/dev/null || true
-          exit 1
+          if [ "$code" = "000" ] || [ "$code" -ge 500 ]; then
+            echo "✗ / returned 5xx (or no response) — SSR render failure:"
+            tail -50 server.log; exit 1
+          fi
+          echo "✓ home route renders (no 5xx)"
 
   # Stable aggregate gate to require in branch protection; passes only if every
   # gating job did. Require THIS single context (not the individual jobs) so the
