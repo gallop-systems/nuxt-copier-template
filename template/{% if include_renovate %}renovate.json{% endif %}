@@ -20,6 +20,11 @@
       "description": "Bump the kysely ecosystem as one PR. kysely 0.x minors are breaking and kysely-ctl/kysely-codegen pin a kysely range, so splitting them lands a kysely the migration CLI can't import.",
       "matchPackageNames": ["kysely", "kysely-ctl", "kysely-codegen"],
       "groupName": "kysely"
+    },
+    {
+      "description": "Bump the PrimeVue / PrimeUIX stack as one PR. These packages share transitive @primevue/core and @primeuix/styles; bumping any subset (e.g. adding @primevue/forms or @primeuix/themes alongside primevue) leaves two versions in the tree that Nitro mis-traces into .output/server, crashing prod SSR at boot or 500ing every route at render. The CI render check is the backstop; grouping removes the duplication at its source. primeicons is excluded — standalone icon font, no shared core.",
+      "matchPackageNames": ["primevue", "/^@primevue\\//", "/^@primeuix\\//"],
+      "groupName": "primevue"
     }
   ]
 }
