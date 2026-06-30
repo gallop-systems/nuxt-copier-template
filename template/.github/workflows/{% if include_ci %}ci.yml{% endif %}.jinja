@@ -124,10 +124,6 @@ jobs:
       - run: yarn build
         env:
           NODE_OPTIONS: --experimental-strip-types --max-old-space-size=6144
-          # This build is only boot-tested below, never shipped — skip the slow
-          # server-sourcemap generation. Deploy builds don't set this, so they
-          # keep server sourcemaps for Sentry (see nuxt.config.ts).
-          NUXT_CI_BUILD: '1'
       - name: Boot the production build
         # typecheck and tests never exercise the real `.output` server, so they
         # miss failures that only surface there — e.g. a dependency that

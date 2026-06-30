@@ -49,14 +49,6 @@ export default defineNuxtConfig({
   // has its own node_modules; without this the watcher recurses into all of
   // them and exhausts the process file-descriptor limit (EMFILE on `nuxt dev`).
   ignore: ["**/.claude/worktrees/**"],
-  // Server sourcemaps (Nuxt default `sourcemap.server = true`) are needed in
-  // PRODUCTION so Sentry can de-minify server-side stack traces. But generating
-  // them is a large share of build time, and the CI `build` job only boot-tests
-  // `.output` (see .github/workflows/ci.yml) — nothing there reads them, and
-  // skipping them doesn't change whether the server boots. So drop them ONLY in
-  // CI, gated on the explicit NUXT_CI_BUILD flag the build job sets. Deploy
-  // builds (and local) keep full server sourcemaps. Client sourcemaps untouched.
-  sourcemap: { server: !process.env.NUXT_CI_BUILD },
   vite: {
     plugins: [tailwindcss()],
     server: {
