@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.18.0...v1.18.1) (2026-06-30)
+
+
+### Continuous Integration
+
+* **template:** render-check the build job (not just boot) ([cb5bcf3](https://github.com/gallop-systems/nuxt-copier-template/commit/cb5bcf3a7abf0c1bd4afe7fc9ba75ca0df12f440))
+* **template:** render-check the build, not just boot ([0ca2ea2](https://github.com/gallop-systems/nuxt-copier-template/commit/0ca2ea239a187f4730b6d8fc173d153906264ea4))
+
 ## [1.18.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.17.1...v1.18.0) (2026-06-30)
 
 
