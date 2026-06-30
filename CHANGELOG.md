@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.18.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.17.1...v1.18.0) (2026-06-30)
+
+
+### Features
+
+* **template:** add ci_runner toggle for self-hosted runners ([25e3295](https://github.com/gallop-systems/nuxt-copier-template/commit/25e32951555de088fbdbf96af42977b7b2d932e6))
+* **template:** de-shard CI, container-mode test job, faster build ([4f729da](https://github.com/gallop-systems/nuxt-copier-template/commit/4f729daa9c96a10b0ec0e78bc354970775a84ad5))
+* **template:** drop self-hosted runner option, keep CI improvements ([fa2e051](https://github.com/gallop-systems/nuxt-copier-template/commit/fa2e05180192d104368a6f0df8703afad418d2ca))
+* **template:** leaner GitHub-hosted CI (de-shard, container test, SSL fix) ([5de423e](https://github.com/gallop-systems/nuxt-copier-template/commit/5de423ea09ccca7de8179f12668bf61db79c37af))
+
 ## [1.17.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.17.0...v1.17.1) (2026-06-29)
 
 
