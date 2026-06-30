@@ -7,6 +7,7 @@
 
 * **template:** render-check the build job (not just boot) ([cb5bcf3](https://github.com/gallop-systems/nuxt-copier-template/commit/cb5bcf3a7abf0c1bd4afe7fc9ba75ca0df12f440))
 * **template:** render-check the build, not just boot ([0ca2ea2](https://github.com/gallop-systems/nuxt-copier-template/commit/0ca2ea239a187f4730b6d8fc173d153906264ea4))
+* **template:** group PrimeVue/PrimeUIX Renovate bumps to prevent dual-version prod breaks ([22c0f26](https://github.com/gallop-systems/nuxt-copier-template/commit/22c0f26856317eb4b3519c7c2d6303e6303ecfd6))
 
 ## [1.18.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.17.1...v1.18.0) (2026-06-30)
 
