@@ -1,4 +1,4 @@
-{% if ci_runner == 'self-hosted' %}{% set runner = '[self-hosted, gallop-ci]' %}{% else %}{% set runner = 'ubuntu-latest' %}{% endif %}name: CI
+name: CI
 
 on:
   push:
@@ -20,17 +20,17 @@ permissions:
   checks: write
 
 jobs:
-  # Backend tests. No sharding: Vitest already parallelizes the suite across
-  # worker threads within this one job, so on the self-hosted multi-core runner
-  # it uses all available cores — splitting across machines would only add
-  # per-shard install/checkout overhead. (On the github-hosted option it's a
-  # single 2-core job, still fine for a young suite.)
+  # Backend tests. No sharding: the `build` job is the gate's long pole (a few
+  # minutes), and the test suite finishes well under that, so splitting it across
+  # shards wouldn't move when CI goes green — it would only multiply the billed
+  # per-shard install/checkout minutes. Vitest parallelizes across worker threads
+  # within this one job. If the suite ever grows large enough to rival the build
+  # time, reintroduce a shard matrix then.
   test:
-    runs-on: {{ runner }}
-    # Run in a container so the postgres service attaches to a private per-job
-    # network and is reachable by its label hostname (`postgres`) — no host-port
-    # mapping, so concurrent jobs on a shared self-hosted runner host never
-    # collide on 5432. Works identically on github-hosted runners.
+    runs-on: ubuntu-latest
+    # Run the job in a container so the postgres service is reachable by its
+    # label hostname (`postgres`) on a private per-job network — no host-port
+    # mapping needed.
     container: node:22
     services:
       postgres:
@@ -75,7 +75,7 @@ jobs:
   # here — `build` (the other heavy job) stays separate so the two 6GB-heap steps
   # (typecheck + build) don't serialize and stretch the gate.
   checks:
-    runs-on: {{ runner }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -105,7 +105,7 @@ jobs:
           NODE_OPTIONS: --experimental-strip-types
 
   build:
-    runs-on: {{ runner }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -157,7 +157,7 @@ jobs:
     name: ci-success
     if: always()
     needs: [test, checks, build]
-    runs-on: {{ runner }}
+    runs-on: ubuntu-latest
     steps:
       - name: Verify all required jobs succeeded
         run: |

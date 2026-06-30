@@ -35,19 +35,6 @@ include_ci:
   help: "Include GitHub Actions CI workflow?"
   default: true
 
-ci_runner:
-  type: str
-  help: "Where should CI run?"
-  choices:
-    # Gallop's self-hosted DO runner pool (label `gallop-ci`); private repos
-    # don't bill GitHub minutes against it. See infra/ci-runners in the template.
-    Self-hosted (Gallop runner pool): self-hosted
-    GitHub-hosted (ubuntu-latest): github-hosted
-  # Held at github-hosted during the self-hosted runner-fleet rollout; flip to
-  # self-hosted once the fleet is validated and serving the gallop-systems org.
-  default: github-hosted
-  when: "{{ include_ci }}"
-
 include_git_hooks:
   type: bool
   help: "Include lefthook git hooks?"
