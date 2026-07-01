@@ -150,7 +150,7 @@ jobs:
       - working-directory: scaffold
         run: yarn test:run
         env:
-          TEST_POSTGRESQL_CONNECTION_STRING: postgres://postgres:postgres@localhost:5432/gallop_tpl_test-test
+          NUXT_DATABASE_URL_TEST: postgres://postgres:postgres@localhost:5432/gallop_tpl_test-test
           NODE_OPTIONS: --experimental-strip-types
 
   # Production build + boot + page smoke (bin/smoke.sh). No DB: the smoked pages
