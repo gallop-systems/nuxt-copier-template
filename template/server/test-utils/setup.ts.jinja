@@ -4,9 +4,6 @@ function getTestConnectionString(): string {
   if (process.env.NUXT_DATABASE_URL_TEST) {
     return process.env.NUXT_DATABASE_URL_TEST;
   }
-  if (process.env.TEST_POSTGRESQL_CONNECTION_STRING) {
-    return process.env.TEST_POSTGRESQL_CONNECTION_STRING;
-  }
   return "postgresql://localhost/{{ database_name }}-test";
 }
 
