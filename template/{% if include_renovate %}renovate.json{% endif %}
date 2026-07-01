@@ -3,6 +3,7 @@
   "extends": ["config:recommended", ":maintainLockFilesWeekly"],
   "minimumReleaseAge": "2 weeks",
   "internalChecksFilter": "strict",
+  "rebaseWhen": "behind-base-branch",
   "copier": { "enabled": false },
   "packageRules": [
     {
