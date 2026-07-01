@@ -12,20 +12,21 @@
       "enabled": false
     },
     {
-      "description": "Auto-merge devDependency minor/patch updates once CI passes — they rarely touch runtime and the ci-success gate guards them.",
-      "matchDepTypes": ["devDependencies"],
+      "description": "Auto-merge minor/patch updates (prod + dev) once CI passes. CI runs typecheck, the SSR render check, and the test suite, so a broken bump — e.g. a duplicate-transitive-dep type skew that a minor drags in — fails CI and stays open as a red PR for a human; automerge only ever lands green updates. Majors are never matched here, so they always get a manual PR. The kysely and primevue groups below opt back out.",
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
     },
     {
-      "description": "Bump the kysely ecosystem as one PR. kysely 0.x minors are breaking and kysely-ctl/kysely-codegen pin a kysely range, so splitting them lands a kysely the migration CLI can't import.",
+      "description": "Bump the kysely ecosystem as one PR. kysely 0.x minors are breaking and kysely-ctl/kysely-codegen pin a kysely range, so splitting them lands a kysely the migration CLI can't import. Not auto-merged: a 0.x minor here can break the query builder or migration CLI in ways CI may not catch, so it keeps a manual review.",
       "matchPackageNames": ["kysely", "kysely-ctl", "kysely-codegen"],
-      "groupName": "kysely"
+      "groupName": "kysely",
+      "automerge": false
     },
     {
-      "description": "Bump the PrimeVue / PrimeUIX stack as one PR. These packages share transitive @primevue/core and @primeuix/styles; bumping any subset (e.g. adding @primevue/forms or @primeuix/themes alongside primevue) leaves two versions in the tree that Nitro mis-traces into .output/server, crashing prod SSR at boot or 500ing every route at render. The CI render check is the backstop; grouping removes the duplication at its source. primeicons is excluded — standalone icon font, no shared core.",
+      "description": "Bump the PrimeVue / PrimeUIX stack as one PR. These packages share transitive @primevue/core and @primeuix/styles; bumping any subset (e.g. adding @primevue/forms or @primeuix/themes alongside primevue) leaves two versions in the tree that Nitro mis-traces into .output/server, crashing prod SSR at boot or 500ing every route at render. The CI render check is the backstop; grouping removes the duplication at its source. primeicons is excluded — standalone icon font, no shared core. Not auto-merged: the render check catches SSR 5xx but not silent visual/theme regressions, so the UI stack keeps a human in the loop.",
       "matchPackageNames": ["primevue", "/^@primevue\\//", "/^@primeuix\\//"],
-      "groupName": "primevue"
+      "groupName": "primevue",
+      "automerge": false
     }
   ]
 }
