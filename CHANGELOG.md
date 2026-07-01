@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.18.2...v1.19.0) (2026-07-01)
+
+
+### Features
+
+* **renovate:** auto-merge prod minor/patch updates, not just devDeps ([#63](https://github.com/gallop-systems/nuxt-copier-template/issues/63)) ([90203b4](https://github.com/gallop-systems/nuxt-copier-template/commit/90203b4508eb55b11220826dbef3c21c8b836890))
+
 ## [1.18.2](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.18.1...v1.18.2) (2026-07-01)
 
 
