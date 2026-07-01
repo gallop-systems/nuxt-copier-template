@@ -2,6 +2,12 @@ import type { DB } from "../db/db";
 import { Kysely, PostgresDialect } from "kysely";
 import pg from "pg";
 
+// Return DATE columns as plain "YYYY-MM-DD" strings instead of JS Date objects.
+// node-postgres otherwise parses DATE into a Date at local midnight, which shifts
+// the day across timezones. This pairs with `--date-parser string` in db:codegen,
+// so the generated types (string) match the runtime value.
+pg.types.setTypeParser(pg.types.builtins.DATE, (value) => value);
+
 const config = useRuntimeConfig();
 
 // Decide SSL by the connection target, not the app environment: a local
