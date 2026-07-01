@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.2](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.18.1...v1.18.2) (2026-07-01)
+
+
+### Bug Fixes
+
+* **template:** rebase Renovate PRs when base branch advances ([c2c5f36](https://github.com/gallop-systems/nuxt-copier-template/commit/c2c5f3667823110cf58eccfd2c7d7d401ca0231a))
+* **template:** rebase Renovate PRs when base branch advances ([3368765](https://github.com/gallop-systems/nuxt-copier-template/commit/3368765ba8f31f644127a4dc76f860f107b0a633))
+
 ## [1.18.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.18.0...v1.18.1) (2026-06-30)
 
 
