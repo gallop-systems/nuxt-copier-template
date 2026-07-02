@@ -44,6 +44,9 @@ export default isFrontendTest
           "@": path.resolve(__dirname),
           "~~": path.resolve(__dirname),
           "@@": path.resolve(__dirname),
+          // Nuxt provides `#server` (server/ dir) in the app + nuxt-env test
+          // build; plain-vitest backend tests don't get it, so map it here.
+          "#server": path.resolve(__dirname, "server"),
         },
       },
     });

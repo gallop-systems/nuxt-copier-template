@@ -16,7 +16,7 @@
  *     surfaces the button when the matching public.previewMode flag is on.
  */
 
-import { PREVIEW_ANCHOR_USER } from "~~/server/utils/preview";
+import { PREVIEW_ANCHOR_USER } from "#server/utils/preview";
 
 export default defineEventHandler(async (event) => {
   if (!import.meta.dev || !process.env.NUXT_PREVIEW_MODE) {
