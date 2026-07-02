@@ -40,6 +40,12 @@ yarn build                  # Production build
 - `server/` - Backend (API handlers, database, test utilities)
 - `src/volt/` - Volt UI components (PrimeVue unstyled + Tailwind)
 
+**Server imports:** use the `#server` alias for server-to-server imports
+(`import { PREVIEW_ANCHOR_USER } from "#server/utils/preview"`), not the app-root
+`~~/server/...` path. `#server` points at `server/` and is provided by Nuxt (≥4.3);
+backend vitest maps it in `vitest.config.ts`. The app-root `~` alias is still
+correct for the test-utils barrel (`~/server/test-utils`).
+
 ### UI Components (Volt)
 Volt components are PrimeVue unstyled components with Tailwind styling. Registered with `Volt` prefix via nuxt.config.ts.
 

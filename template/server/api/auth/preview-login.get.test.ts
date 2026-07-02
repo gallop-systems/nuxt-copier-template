@@ -1,7 +1,7 @@
 import { test, expect, mockGet } from "~/server/test-utils";
 import { beforeEach, vi } from "vitest";
 import handler from "./preview-login.get";
-import { PREVIEW_ANCHOR_USER } from "~~/server/utils/preview";
+import { PREVIEW_ANCHOR_USER } from "#server/utils/preview";
 
 // setUserSession / sendRedirect aren't stubbed by the shared setup — stub them
 // here (file-scoped, so we never touch the setup.ts globals like useDatabase).
