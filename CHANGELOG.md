@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.19.0...v1.20.0) (2026-07-02)
+
+
+### Miscellaneous
+
+* release template 1.20.0 ([#66](https://github.com/gallop-systems/nuxt-copier-template/issues/66)) ([0fb2c42](https://github.com/gallop-systems/nuxt-copier-template/commit/0fb2c42ccb3aa13d3cd9d95cf1fd81282cbf8b46))
+
 ## [1.19.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.18.2...v1.19.0) (2026-07-01)
 
 
