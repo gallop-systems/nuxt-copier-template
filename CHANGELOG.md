@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.20.0...v1.21.0) (2026-07-16)
+
+
+### Features
+
+* **template:** surface DB schema comments in generated types ([#74](https://github.com/gallop-systems/nuxt-copier-template/issues/74)) ([e247e09](https://github.com/gallop-systems/nuxt-copier-template/commit/e247e09d873f1003ae6c425b0c6ea319938ed331))
+
 ## [1.20.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.19.0...v1.20.0) (2026-07-02)
 
 
