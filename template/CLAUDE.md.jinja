@@ -65,6 +65,16 @@ Available: VoltAvatar, VoltButton, VoltCard, VoltConfirmDialog, VoltDataTable, V
 - `server/db/db.d.ts` - Auto-generated types (via `yarn db:codegen`)
 - `kysely.config.ts` - Migration + seed configuration
 
+**Schema documentation lives in the DB, not just in migration source.** Use
+Postgres `COMMENT ON TABLE/COLUMN/INDEX/CONSTRAINT` so the design notes survive on
+a live database and flow into the generated types. `yarn db:codegen` runs
+`kysely-codegen` (which emits column comments as JSDoc) then
+`scripts/inject-table-comments.mjs`, which injects each table's comment plus
+`Indexes:` / `Constraints:` sections above its `export interface` in
+`server/db/db.d.ts`. Read those JSDoc blocks to understand a table before querying
+or changing it, and update the comments in the same migration that changes how
+something works.
+
 ### Seeds (Convention)
 Seeds populate a preview/dev DB with the minimum needed to log in and work.
 
