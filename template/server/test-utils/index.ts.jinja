@@ -16,7 +16,7 @@ import type { DB } from "../db/db";
 
 // Factories live in server/db/factories.ts so seeds (server/db/seeds) can share
 // the exact same row builders as tests — re-exported here for the familiar
-// `import { test, ... } from "~/server/test-utils"` surface.
+// `import { test, ... } from "#server/test-utils"` surface.
 export { createFactories, type Factories };
 
 let currentTrx: Transaction<DB> | null = null;

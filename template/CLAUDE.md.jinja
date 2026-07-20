@@ -43,8 +43,9 @@ yarn build                  # Production build
 **Server imports:** use the `#server` alias for server-to-server imports
 (`import { PREVIEW_ANCHOR_USER } from "#server/utils/preview"`), not the app-root
 `~~/server/...` path. `#server` points at `server/` and is provided by Nuxt (≥4.3);
-backend vitest maps it in `vitest.config.ts`. The app-root `~` alias is still
-correct for the test-utils barrel (`~/server/test-utils`).
+backend vitest maps it in `vitest.config.ts`. Use `#server/test-utils` for the
+test-utils barrel too — the app-root `~` alias resolves to `app/` under the
+server tsconfig project, so `~/server/...` fails `yarn typecheck` on server code.
 
 ### UI Components (Volt)
 Volt components are PrimeVue unstyled components with Tailwind styling. Registered with `Volt` prefix via nuxt.config.ts.
@@ -104,7 +105,7 @@ so it logs in via a dev-only backdoor instead:
 Tests use real PostgreSQL with automatic transaction rollback for isolation.
 
 ```typescript
-import { test, expect, mockGet, mockPost, expectHttpError } from "~/server/test-utils";
+import { test, expect, mockGet, mockPost, expectHttpError } from "#server/test-utils";
 import handler from "./index.get";
 
 test("returns users", async ({ factories }) => {

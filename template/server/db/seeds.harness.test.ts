@@ -18,8 +18,8 @@
  * here" == "runs clean against the latest migration".
  */
 
-import { test, expect } from "~/server/test-utils";
-import { PREVIEW_ANCHOR_USER } from "~/server/utils/preview";
+import { test, expect } from "#server/test-utils";
+import { PREVIEW_ANCHOR_USER } from "#server/utils/preview";
 import type { DbLike } from "./factories";
 
 interface SeedModule {
@@ -39,7 +39,7 @@ test("every seed runs clean against the latest migration", async ({ db }) => {
   expect(seedPaths.length).toBeGreaterThan(0);
 
   for (const path of seedPaths) {
-    const mod = await seedModules[path]();
+    const mod = await seedModules[path]!();
     try {
       await mod.seed(db);
     } catch (err) {
@@ -60,7 +60,7 @@ test("every seed runs clean against the latest migration", async ({ db }) => {
 test("the full seed set is idempotent (running twice does not throw)", async ({ db }) => {
   for (let pass = 1; pass <= 2; pass++) {
     for (const path of seedPaths) {
-      const mod = await seedModules[path]();
+      const mod = await seedModules[path]!();
       try {
         await mod.seed(db);
       } catch (err) {

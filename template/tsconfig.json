@@ -1,3 +1,12 @@
 {
-  "extends": "./.nuxt/tsconfig.json"
+  // https://nuxt.com/docs/guide/concepts/typescript
+  // Nuxt 4 generates per-context tsconfigs; use project references so
+  // typecheck covers app, server, shared and build-time (node) code.
+  "files": [],
+  "references": [
+    { "path": "./.nuxt/tsconfig.app.json" },
+    { "path": "./.nuxt/tsconfig.server.json" },
+    { "path": "./.nuxt/tsconfig.shared.json" },
+    { "path": "./.nuxt/tsconfig.node.json" }
+  ]
 }
