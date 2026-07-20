@@ -1,4 +1,4 @@
-import { describe, test, expect } from "~/server/test-utils";
+import { describe, test, expect } from "#server/test-utils";
 import { decideOAuthStateAction, resolveMicrosoftSignIn } from "./microsoft-auth";
 
 describe("decideOAuthStateAction", () => {

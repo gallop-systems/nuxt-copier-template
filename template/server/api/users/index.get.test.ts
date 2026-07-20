@@ -1,4 +1,4 @@
-import { describe, test, expect, mockGet } from "~/server/test-utils";
+import { describe, test, expect, mockGet } from "#server/test-utils";
 import handler from "./index.get";
 
 describe("GET /api/users", () => {
@@ -13,6 +13,6 @@ describe("GET /api/users", () => {
     const event = mockGet();
     const result = await handler(event);
     expect(result).toHaveLength(1);
-    expect(result[0].email).toBe("alice@example.com");
+    expect(result[0]!.email).toBe("alice@example.com");
   });
 });
