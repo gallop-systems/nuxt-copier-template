@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.21.0...v1.21.1) (2026-07-20)
+
+
+### Bug Fixes
+
+* **template:** typecheck server code via project references ([#76](https://github.com/gallop-systems/nuxt-copier-template/issues/76)) ([2ee04cd](https://github.com/gallop-systems/nuxt-copier-template/commit/2ee04cd093d8265af14918dd100ee426e98a4c69))
+
 ## [1.21.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.20.0...v1.21.0) (2026-07-16)
 
 
