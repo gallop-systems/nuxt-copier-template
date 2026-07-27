@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.22.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.21.1...v1.22.0) (2026-07-27)
+
+
+### Features
+
+* **template:** enforce 2-week minimum package age at the yarn level ([#78](https://github.com/gallop-systems/nuxt-copier-template/issues/78)) ([f512326](https://github.com/gallop-systems/nuxt-copier-template/commit/f512326d7f89d30496284c668f8fcf7071dd9638))
+
 ## [1.21.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.21.0...v1.21.1) (2026-07-20)
 
 
