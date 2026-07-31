@@ -40,6 +40,12 @@
       "description": "Bump Node together everywhere — template/.nvmrc (nvm) and package.json.jinja engines.node (custom manager) — so dev/CI and the DO deploy version never drift apart.",
       "matchPackageNames": ["node"],
       "groupName": "node"
+    },
+    {
+      "description": "Never offer PrimeVue majors for the package.json.jinja pin. v5 moved to a commercial license and the fleet is migrating off PrimeVue; descendants carry the same rule in their scaffolded renovate.json. Remove this rule if the migration is abandoned.",
+      "matchPackageNames": ["primevue", "/^@primevue\\//", "/^@primeuix\\//"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     }
   ]
 }

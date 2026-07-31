@@ -27,6 +27,18 @@
       "matchPackageNames": ["primevue", "/^@primevue\\//", "/^@primeuix\\//"],
       "groupName": "primevue",
       "automerge": false
+    },
+    {
+      "description": "Never offer PrimeVue majors. v5 moved to a commercial license and these apps are migrating off PrimeVue, so the major PR is pure noise — and because it is a grouped PR it is immortal: closing it just makes Renovate recreate it on the next run. Disabling the update type is the only way to keep it closed. Remove this rule if the migration is abandoned.",
+      "matchPackageNames": ["primevue", "/^@primevue\\//", "/^@primeuix\\//"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "Exempt lockfile maintenance from the release-age gate and auto-merge it when green. minimumReleaseAge posts a renovate/stability-days status on the weekly lockfile PR that can never clear — the weekly rebase restarts the two-week clock before it expires — so these PRs sat blocked forever despite green CI. Age is already enforced where it matters: yarn's npmMinimalAgeGate quarantines too-new versions at resolution time, covering lockfile maintenance and every other path into the tree. With the redundant gate dropped, the same automerge contract as minor/patch applies: CI green merges, CI red stays open for a human.",
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "minimumReleaseAge": null,
+      "automerge": true
     }
   ]
 }
