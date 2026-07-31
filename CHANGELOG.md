@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.22.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.22.0...v1.22.1) (2026-07-31)
+
+
+### Bug Fixes
+
+* **template:** disable PrimeVue majors and unblock lockfile maintenance ([#81](https://github.com/gallop-systems/nuxt-copier-template/issues/81)) ([5b85164](https://github.com/gallop-systems/nuxt-copier-template/commit/5b851647258015482a3192e2f7e2f77b916c2478))
+
 ## [1.22.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.21.1...v1.22.0) (2026-07-27)
 
 
