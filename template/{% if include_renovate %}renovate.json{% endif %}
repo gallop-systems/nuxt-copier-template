@@ -1,6 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":maintainLockFilesWeekly"],
+  "description": "Weekend-only schedule (GAL-1004): dependency PRs are batched into Saturday/Sunday so the weekday PR queue stays signal-heavy. The schedule gates branch/PR creation; automergeSchedule is left at its default so a green PR can still merge mid-week after a red-CI fix.",
+  "extends": ["config:recommended"],
+  "timezone": "America/New_York",
+  "schedule": ["every weekend"],
+  "lockFileMaintenance": {
+    "description": "Replaces :maintainLockFilesWeekly, whose schedule ('before 4am on monday') would let the lockfile PR land on a weekday despite the weekend-only schedule above.",
+    "enabled": true,
+    "schedule": ["every weekend"]
+  },
   "minimumReleaseAge": "2 weeks",
   "internalChecksFilter": "strict",
   "rebaseWhen": "behind-base-branch",

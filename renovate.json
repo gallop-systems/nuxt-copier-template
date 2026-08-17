@@ -1,6 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Weekend-only schedule (GAL-1004): dependency PRs are batched into Saturday/Sunday so the weekday PR queue stays signal-heavy. Descendants carry the same schedule in their scaffolded renovate.json.",
   "extends": ["config:recommended"],
+  "timezone": "America/New_York",
+  "schedule": ["every weekend"],
   "semanticCommits": "enabled",
   "minimumReleaseAge": "2 weeks",
   "semanticCommitType": "fix",
