@@ -1,8 +1,12 @@
-import { decideOAuthStateAction, resolveMicrosoftSignIn } from "../../utils/microsoft-auth";
+import { resolveMicrosoftSignIn } from "../../utils/microsoft-auth";
 
-const STATE_COOKIE = "ms-oauth-state";
-const STATE_PATH = "/auth/microsoft";
-
+/**
+ * nuxt-auth-utils mints the OAuth `state`, stores it in its own
+ * `nuxt-auth-state` cookie, and rejects any callback whose returned state does
+ * not match, so the CSRF check we used to wrap this handler with is now the
+ * provider's job. Wrapping it again breaks the flow: the provider discards the
+ * outer state and forwards its own, so the outer comparison can never match.
+ */
 const microsoftHandler = defineOAuthMicrosoftEventHandler({
   config: {
     scope: ["openid", "profile", "email", "User.Read"],
@@ -31,40 +35,18 @@ const microsoftHandler = defineOAuthMicrosoftEventHandler({
 });
 
 /**
- * nuxt-auth-utils' Microsoft provider forwards `state` to Microsoft but does
- * not validate it on the callback (unlike its other providers), leaving the
- * flow open to OAuth login CSRF. We wrap it: mint a state, store it in a
- * cookie, re-enter so the provider forwards it, and reject any callback whose
- * returned state doesn't match. All token/redirect work is left to the
- * provider so the computed redirect_uri stays consistent across both legs.
+ * The provider handler treats "no `code` in the query" as "start authorization",
+ * so an error callback — the user cancelling at the Microsoft consent screen
+ * sends `?error=access_denied` and no code — would bounce them straight back to
+ * Microsoft in a loop. Catch that here and return them to /login instead.
  */
 export default defineEventHandler((event) => {
   const query = getQuery(event);
-  const action = decideOAuthStateAction(
-    { code: query.code, error: query.error, state: query.state },
-    getCookie(event, STATE_COOKIE),
-  );
 
-  if (action === "mint") {
-    const state = crypto.randomUUID();
-    setCookie(event, STATE_COOKIE, state, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: !import.meta.dev,
-      path: STATE_PATH,
-      maxAge: 600,
-    });
-    return sendRedirect(event, `${STATE_PATH}?state=${state}`);
-  }
-
-  if (action === "reject") {
-    deleteCookie(event, STATE_COOKIE, { path: STATE_PATH });
+  if (query.error) {
+    console.error("Microsoft OAuth error callback:", query.error, query.error_description);
     return sendRedirect(event, "/login?error=auth_failed");
   }
 
-  // Clear the one-time state cookie before the provider exchanges the code.
-  if (query.code) {
-    deleteCookie(event, STATE_COOKIE, { path: STATE_PATH });
-  }
   return microsoftHandler(event);
 });
