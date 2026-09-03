@@ -20,40 +20,6 @@ export type MicrosoftSignInResult =
   | { ok: true; user: SessionUser }
   | { ok: false; error: "no_email" | "account_deactivated" };
 
-export type OAuthStateAction = "mint" | "delegate" | "reject";
-
-/**
- * Decides how the Microsoft route should treat a request, given the query and
- * the state we previously stored in a cookie. Pure so it can be unit-tested
- * without the OAuth/h3 machinery.
- *
- * - "mint": first hit with no state — issue a state and re-enter.
- * - "delegate": hand off to the provider (re-entry with state, or a verified
- *   success callback).
- * - "reject": an error callback (cancel/deny), or a success callback whose
- *   state is missing or does not match — send the user back to /login.
- */
-export function decideOAuthStateAction(
-  query: { code?: unknown; error?: unknown; state?: unknown },
-  expectedState: string | undefined,
-): OAuthStateAction {
-  // Callback from Microsoft carries either a `code` (success) or an `error`
-  // (the user cancelled or consent failed); both echo back our `state`.
-  if (query.code || query.error) {
-    if (query.error) {
-      return "reject";
-    }
-    if (!expectedState || query.state !== expectedState) {
-      return "reject";
-    }
-    return "delegate";
-  }
-
-  // Not a callback: the first hit has no state and must mint one; the
-  // re-entry already carries state and is handed off to the provider.
-  return query.state ? "delegate" : "mint";
-}
-
 function toSessionUser(user: Selectable<Users>): SessionUser {
   return {
     id: Number(user.id),

@@ -1,31 +1,5 @@
 import { describe, test, expect } from "#server/test-utils";
-import { decideOAuthStateAction, resolveMicrosoftSignIn } from "./microsoft-auth";
-
-describe("decideOAuthStateAction", () => {
-  test("mints a state on the first hit (no code, no state)", () => {
-    expect(decideOAuthStateAction({}, undefined)).toBe("mint");
-  });
-
-  test("delegates the re-entry that already carries a state", () => {
-    expect(decideOAuthStateAction({ state: "abc" }, "abc")).toBe("delegate");
-  });
-
-  test("delegates a success callback whose state matches the cookie", () => {
-    expect(decideOAuthStateAction({ code: "xyz", state: "abc" }, "abc")).toBe("delegate");
-  });
-
-  test("rejects a success callback whose state does not match", () => {
-    expect(decideOAuthStateAction({ code: "xyz", state: "abc" }, "different")).toBe("reject");
-  });
-
-  test("rejects a success callback when no state cookie is present", () => {
-    expect(decideOAuthStateAction({ code: "xyz", state: "abc" }, undefined)).toBe("reject");
-  });
-
-  test("rejects an error callback (e.g. user cancelled) instead of restarting", () => {
-    expect(decideOAuthStateAction({ error: "access_denied", state: "abc" }, "abc")).toBe("reject");
-  });
-});
+import { resolveMicrosoftSignIn } from "./microsoft-auth";
 
 describe("resolveMicrosoftSignIn", () => {
   test("auto-provisions a new user from the Microsoft profile", async ({ db }) => {
