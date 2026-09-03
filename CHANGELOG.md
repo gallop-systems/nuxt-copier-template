@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.22.2](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.22.1...v1.22.2) (2026-09-03)
+
+
+### Bug Fixes
+
+* **template:** remove the redundant Microsoft OAuth state wrapper ([#87](https://github.com/gallop-systems/nuxt-copier-template/issues/87)) ([6cacfe2](https://github.com/gallop-systems/nuxt-copier-template/commit/6cacfe220319ce0e4f39ed95680d868ace93fe0d))
+* **template:** restrict Renovate to weekend PRs (GAL-1004) ([#83](https://github.com/gallop-systems/nuxt-copier-template/issues/83)) ([330b728](https://github.com/gallop-systems/nuxt-copier-template/commit/330b7281ec7198b3274e061b4f3f41e38a0d50ec))
+
 ## [1.22.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.22.0...v1.22.1) (2026-07-31)
 
 
