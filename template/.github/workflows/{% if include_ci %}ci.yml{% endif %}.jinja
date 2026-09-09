@@ -3,8 +3,11 @@ name: CI
 on:
   push:
     branches: [main]
+  # No `branches:` filter here. That filter matches a PR's *base*, so scoping it
+  # to `main` skipped every stacked PR (each layer targets the layer below it),
+  # and those PRs showed no checks at all, which reads as "still running" rather
+  # than "never queued".
   pull_request:
-    branches: [main]
 
 # Cancel superseded PR runs: pushing again to a branch aborts its in-flight run,
 # so we never pay for CI on commits a newer push already replaced. Left on for
