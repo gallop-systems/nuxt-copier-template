@@ -10,6 +10,15 @@
   "customManagers": [
     {
       "customType": "regex",
+      "description": "Track the agent-skills caret pin with only the version digits as currentValue. rangeStrategy bump is ignored for custom managers (Renovate's getRangeStrategy returns null for them), so under a full ^range every 1.x release already satisfies it and no update is ever proposed; treating the digits as an exact version makes each release a real update, with the ^ preserved.",
+      "managerFilePatterns": ["/^template/package\\.json\\.jinja$/"],
+      "matchStrings": [
+        "\"(?<depName>@gallopsystems/agent-skills)\":\\s*\"\\^(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
       "description": "Bump npm dependency pins inside the copier-templated package.json.jinja",
       "managerFilePatterns": ["/^template/package\\.json\\.jinja$/"],
       "matchStrings": [
@@ -29,9 +38,18 @@
   ],
   "packageRules": [
     {
-      "description": "Auto-merge the agent-skills bump so it lands without a manual PR merge; release-please then cuts the patch.",
+      "description": "The generic regex manager also sees the agent-skills line with the full ^range as currentValue, which never updates; the dedicated manager above owns it, so skip this duplicate.",
       "matchManagers": ["custom.regex"],
       "matchPackageNames": ["@gallopsystems/agent-skills"],
+      "matchCurrentValue": "/^\\^/",
+      "enabled": false
+    },
+    {
+      "description": "Our own package, delivered to every descendant only via copier update (they disable Renovate for it). Matched by its own regex manager so the floor is bumped on every release (the pin is a caret range and the template has no lockfile, so a plain range would never update; rangeStrategy bump does not apply to custom managers). minimumReleaseAge null and schedule at any time: we publish it ourselves, so the 2-week age gate and weekend schedule only delay new skills. automerge so it lands without a manual PR merge; release-please then cuts the patch.",
+      "matchManagers": ["custom.regex"],
+      "matchPackageNames": ["@gallopsystems/agent-skills"],
+      "minimumReleaseAge": null,
+      "schedule": ["at any time"],
       "automerge": true
     },
     {
