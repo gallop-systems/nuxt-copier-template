@@ -8,6 +8,9 @@ pre-commit:
       glob: "*.{ts,tsx,vue,js,jsx}"
       run: yarn lint --fix
       stage_fixed: true
+    migration-filenames:
+      glob: "server/db/migrations/*.ts"
+      run: node scripts/check-migration-filenames.mjs {staged_files}
 
 pre-push:
   parallel: true

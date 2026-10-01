@@ -17,6 +17,7 @@
     "db:migrate": "kysely migrate:latest",
     "db:migrate:down": "kysely migrate:down",
     "db:migrate:make": "kysely migrate:make",
+    "check:migrations": "node scripts/check-migration-filenames.mjs --base origin/main",
     "db:seed": "kysely seed:run",
     "db:seed:make": "kysely seed:make",
     "db:codegen": "kysely-codegen --url $NUXT_DATABASE_URL --out-file server/db/db.d.ts --dialect postgres --date-parser string && node scripts/inject-table-comments.mjs $NUXT_DATABASE_URL server/db/db.d.ts",
