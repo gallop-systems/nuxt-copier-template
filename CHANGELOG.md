@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.22.3](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.22.2...v1.22.3) (2026-10-01)
+
+
+### Bug Fixes
+
+* **renovate:** let agent-skills bumps open immediately, floor raised each release (GAL-1161) ([#93](https://github.com/gallop-systems/nuxt-copier-template/issues/93)) ([1ccdcde](https://github.com/gallop-systems/nuxt-copier-template/commit/1ccdcdea15320f8f5e377d5b2ff6485d7ede4f23))
+* **yarn:** preapprove @gallopsystems/* past the 2w npm age gate (GAL-1162) ([#92](https://github.com/gallop-systems/nuxt-copier-template/issues/92)) ([4c4d9e6](https://github.com/gallop-systems/nuxt-copier-template/commit/4c4d9e67e827d44a627ff0f7fd0809ff3d277c74))
+
 ## [1.22.2](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.22.1...v1.22.2) (2026-09-03)
 
 
