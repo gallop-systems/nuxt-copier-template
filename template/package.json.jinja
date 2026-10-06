@@ -63,6 +63,14 @@
     "typescript": "^6.0.0",
     "vue-tsc": "^3.3.5"
   },
+  "dependenciesMeta": {
+    "@gallopsystems/agent-skills": {
+      "built": true
+    }{% if include_git_hooks %},
+    "lefthook": {
+      "built": true
+    }{% endif %}
+  },
   "engines": {
     "node": "24.x"
   },
