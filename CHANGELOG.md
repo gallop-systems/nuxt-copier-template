@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.23.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.22.4...v1.23.0) (2026-10-15)
+
+
+### Features
+
+* **template:** gallop-ui shared UI layer support ([#99](https://github.com/gallop-systems/nuxt-copier-template/issues/99)) ([dc1749d](https://github.com/gallop-systems/nuxt-copier-template/commit/dc1749df125d075610cc20fe8d3b5a9d50c961af))
+
 ## [1.22.4](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.22.3...v1.22.4) (2026-10-15)
 
 
