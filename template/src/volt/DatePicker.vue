@@ -1,11 +1,16 @@
 <template>
     <DatePicker
         ref="datepickerRef"
+        v-bind="$attrs"
         unstyled
+        :invalid="invalid"
         :pt="mergedPt"
         :ptOptions="{
             mergeProps: ptViewMerge
         }"
+        @blur="onBlur"
+        @focus="typedInvalid = false"
+        @update:modelValue="typedInvalid = false"
     >
         <template #prevbutton="{ actionCallback, keydownCallback }">
             <SecondaryButton variant="text" rounded @click="actionCallback" @keydown="keydownCallback">
@@ -101,13 +106,73 @@ import ChevronDownIcon from '@primevue/icons/chevrondown';
 import ChevronLeftIcon from '@primevue/icons/chevronleft';
 import ChevronRightIcon from '@primevue/icons/chevronright';
 import ChevronUpIcon from '@primevue/icons/chevronup';
-import DatePicker from 'primevue/datepicker';
-import { computed, mergeProps, ref } from 'vue';
+import BaseDatePicker from 'primevue/datepicker';
+import { isValid, parse } from 'date-fns';
+import { computed, mergeProps, ref, useAttrs } from 'vue';
 import { twMerge } from 'tailwind-merge';
 import SecondaryButton from './SecondaryButton.vue';
 import { ptViewMerge } from './utils';
 
+/**
+ * PrimeVue only reads typed text that matches `dateFormat` exactly, and puts the
+ * previous value back on blur for anything else (GAL-1174). This subclass also
+ * reads the two ways people commonly type a date, M/D/YYYY (US order) and
+ * YYYY-MM-DD, for a single date without a time. PrimeVue saves the parsed date
+ * as you type and shows it in `dateFormat` on blur, so Tab and Enter need no
+ * handling of their own.
+ */
+const FALLBACK_FORMATS = [
+    { pattern: /^\d{1,2}\/\d{1,2}\/\d{4}$/, format: 'M/d/yyyy' },
+    { pattern: /^\d{4}-\d{2}-\d{2}$/, format: 'yyyy-MM-dd' }
+];
+
+function parseFallbackDate(text) {
+    const trimmed = typeof text === 'string' ? text.trim() : '';
+    const match = FALLBACK_FORMATS.find(({ pattern }) => pattern.test(trimmed));
+    if (!match) return null;
+    const date = parse(trimmed, match.format, new Date());
+    return isValid(date) ? date : null;
+}
+
+const DatePicker = {
+    name: 'DatePicker',
+    extends: BaseDatePicker,
+    methods: {
+        parseDateTime(text) {
+            try {
+                return BaseDatePicker.methods.parseDateTime.call(this, text);
+            } catch (err) {
+                const date = this.isSingleSelection() && !this.showTime && !this.timeOnly ? parseFallbackDate(text) : null;
+                if (!date) throw err;
+                return date;
+            }
+        }
+    }
+};
+
+defineOptions({ inheritAttrs: false });
+
 const props = defineProps({ pt: { type: Object, default: () => ({}) } });
+const attrs = useAttrs();
+
+/**
+ * Text that still isn't a date when the input loses focus. PrimeVue puts the
+ * previous value back, so the field never shows one date while holding another;
+ * the red border says the typing was not taken. It clears on the next focus or
+ * when a date is chosen. A caller's own `invalid` is kept.
+ */
+const typedInvalid = ref(false);
+const invalid = computed(() => typedInvalid.value || attrs.invalid === '' || !!attrs.invalid);
+
+function onBlur({ value }) {
+    if (!value || value.trim() === '') return;
+    const picker = datepickerRef.value;
+    try {
+        typedInvalid.value = !picker.isValidSelection(picker.parseValue(value));
+    } catch {
+        typedInvalid.value = true;
+    }
+}
 
 function deepMergePt(base, override) {
     if (!override) return base;
