@@ -24,9 +24,22 @@
   --color-fg: #18181b; /* zinc-900 — primary text */
   --color-fg-muted: #71717a; /* zinc-500 — secondary text */
   --color-fg-subtle: #a1a1aa; /* zinc-400 — tertiary text */
-  --color-accent: #18181b; /* zinc-900 — inverted/primary fills (buttons) */
-  --color-on-accent: #ffffff; /* text/icon on an accent fill */
   --color-fill: #e4e4e7; /* zinc-200 — neutral solid fills: avatars, tracks, dots, skeletons */
+
+  /* Fills and their states (gallop-ui's Button and other controls). Mapped onto
+     the PrimeVue colours the Volt buttons use, so both look the same while they
+     coexist; the dark block below flips the surface ramp ones. */
+  --color-accent: var(--p-primary-color); /* primary fills (buttons) */
+  --color-accent-hover: var(--p-primary-hover-color);
+  --color-accent-active: var(--p-primary-active-color);
+  --color-on-accent: var(--p-primary-contrast-color); /* text/icon on an accent fill */
+  --color-fill-subtle: var(--p-surface-100); /* secondary button */
+  --color-fill-strong: var(--p-surface-300); /* secondary button, pressed */
+  --color-on-fill: var(--p-surface-600);
+  --color-on-fill-hover: var(--p-surface-700);
+  --color-on-fill-active: var(--p-surface-800);
+  --color-surface-active: var(--p-surface-100); /* quiet button, pressed */
+  --color-fg-quiet: var(--p-surface-500); /* quiet button label */
 }
 
 /* Primary palette (zinc) */
@@ -94,9 +107,14 @@
     --color-fg: #f4f4f5; /* zinc-100 */
     --color-fg-muted: #b4b4bc; /* secondary — ~9:1 on near-black */
     --color-fg-subtle: #8c8c95; /* tertiary  — ~5.5:1 on near-black */
-    --color-accent: #f4f4f5; /* zinc-100 — inverts so filled buttons read on dark */
-    --color-on-accent: #18181b; /* zinc-900 */
     --color-fill: #3f3f46; /* zinc-700 — reads as a raised surface on dark */
+    --color-fill-subtle: var(--p-surface-800);
+    --color-fill-strong: var(--p-surface-600);
+    --color-on-fill: var(--p-surface-300);
+    --color-on-fill-hover: var(--p-surface-200);
+    --color-on-fill-active: var(--p-surface-100);
+    --color-surface-active: var(--p-surface-700);
+    --color-fg-quiet: var(--p-surface-400);
 
     --p-primary-color: var(--p-surface-0);
     --p-primary-contrast-color: var(--p-surface-950);
