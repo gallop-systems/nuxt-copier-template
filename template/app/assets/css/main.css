@@ -39,7 +39,14 @@
   --color-on-fill-hover: var(--p-surface-700);
   --color-on-fill-active: var(--p-surface-800);
   --color-surface-active: var(--p-surface-100); /* quiet button, pressed */
-  --color-fg-quiet: var(--p-surface-500); /* quiet button label */
+  --color-fg-quiet: var(--p-surface-500); /* quiet button label; a field's placeholder */
+
+  /* Form controls (gallop-ui's Input and Textarea), mapped onto the PrimeVue colours the
+     Volt fields use. The dark block below flips them. */
+  --color-field: var(--p-surface-0); /* a field's fill */
+  --color-on-field: var(--p-surface-700); /* text in a field */
+  --color-line-strong: var(--p-surface-300); /* a field's border */
+  --color-line-strong-hover: var(--p-surface-400); /* a field's border, hovered */
 }
 
 /* Primary palette (zinc) */
@@ -115,6 +122,10 @@
     --color-on-fill-active: var(--p-surface-100);
     --color-surface-active: var(--p-surface-700);
     --color-fg-quiet: var(--p-surface-400);
+    --color-field: var(--p-surface-950);
+    --color-on-field: var(--p-surface-0);
+    --color-line-strong: var(--p-surface-700);
+    --color-line-strong-hover: var(--p-surface-600);
 
     --p-primary-color: var(--p-surface-0);
     --p-primary-contrast-color: var(--p-surface-950);
