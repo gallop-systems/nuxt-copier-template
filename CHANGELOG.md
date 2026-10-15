@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.22.4](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.22.3...v1.22.4) (2026-10-15)
+
+
+### Bug Fixes
+
+* **template:** accept typed dates in VoltDatePicker on Tab/Enter (GAL-1174) ([#97](https://github.com/gallop-systems/nuxt-copier-template/issues/97)) ([6d1ee18](https://github.com/gallop-systems/nuxt-copier-template/commit/6d1ee188bcb54abad964407e0fc53735f1f0d713))
+
 ## [1.22.3](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.22.2...v1.22.3) (2026-10-01)
 
 
