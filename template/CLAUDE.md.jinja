@@ -58,6 +58,10 @@ Volt components are PrimeVue unstyled components with Tailwind styling. Register
 
 Available: VoltAvatar, VoltButton, VoltCard, VoltConfirmDialog, VoltDataTable, VoltDatePicker, VoltDialog, VoltInputMask, VoltInputText, VoltMessage, VoltMultiSelect, VoltPassword, VoltSecondaryButton, VoltSelect, VoltTag, VoltTextarea, VoltToast
 
+**VoltDatePicker typed input:** besides `dateFormat`, a single date (no time) also accepts typed `M/D/YYYY`
+(US order) and `YYYY-MM-DD`. Text that still isn't a date on blur reverts to the saved value and shows the
+invalid border until the field is focused again or a date is picked.
+
 ### Database (Kysely + PostgreSQL)
 - `server/utils/db.ts` - Database connection, exports `db` and `useDatabase()`
 - `server/db/migrations/` - Kysely migrations

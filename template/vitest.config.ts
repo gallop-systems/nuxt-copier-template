@@ -13,6 +13,7 @@ export default isFrontendTest
           "app/components/**/*.test.ts",
           "app/pages/**/*.test.ts",
           "app/composables/**/*.test.ts",
+          "src/volt/**/*.test.ts",
         ],
       },
     })
