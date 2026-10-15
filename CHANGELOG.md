@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.24.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.23.1...v1.24.0) (2026-10-15)
+
+
+### Features
+
+* **template:** interaction tokens for gallop-ui's Button ([#103](https://github.com/gallop-systems/nuxt-copier-template/issues/103)) ([78b737f](https://github.com/gallop-systems/nuxt-copier-template/commit/78b737f1df19bec86e594635a287a40c960d4f78))
+
 ## [1.23.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.23.0...v1.23.1) (2026-10-15)
 
 
