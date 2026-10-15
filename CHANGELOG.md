@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.23.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.23.0...v1.23.1) (2026-10-15)
+
+
+### Bug Fixes
+
+* **template:** require Nuxt 4.5 ([#101](https://github.com/gallop-systems/nuxt-copier-template/issues/101)) ([6de2713](https://github.com/gallop-systems/nuxt-copier-template/commit/6de27134fbf5444420bab03dc7d0a74a93876a01))
+
 ## [1.23.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.22.4...v1.23.0) (2026-10-15)
 
 
