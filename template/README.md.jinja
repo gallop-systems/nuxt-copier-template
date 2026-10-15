@@ -6,7 +6,7 @@
 
 - **Framework:** [Nuxt 4](https://nuxt.com/) (Vue 3, TypeScript)
 - **Styling:** [Tailwind CSS 4](https://tailwindcss.com/)
-- **UI Components:** [Volt](https://volt.primevue.org/) (PrimeVue + Tailwind)
+- **UI Components:** gallop-ui, Gallop's shared UI layer (`layers/gallop-ui`), and [Volt](https://volt.primevue.org/) (PrimeVue + Tailwind) while gallop-ui replaces it
 - **Database:** PostgreSQL with [Kysely](https://kysely.dev/) (type-safe query builder)
 - **Validation:** [Zod](https://zod.dev/)
 - **Auth:** [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils) (session-based{% if auth_provider == 'google' %}, Google OAuth{% elif auth_provider == 'microsoft' %}, Microsoft OAuth{% endif %})
@@ -74,6 +74,20 @@ yarn test:frontend
 
 # Run frontend tests once
 yarn test:frontend:run
+
+# Run the shared UI layer's tests
+yarn ui:test
+```
+
+## Shared UI (gallop-ui)
+
+`layers/gallop-ui` is a git subtree of [gallop-systems/gallop-ui](https://github.com/gallop-systems/gallop-ui).
+Its `CATALOGUE.md` lists the components and its `README.md` explains customizing them.
+
+```bash
+yarn ui:version         # the version this app has
+yarn ui:pull            # take the latest release (or: yarn ui:pull vX.Y.Z)
+yarn ui:push <branch>   # send layer commits back, then open a PR in gallop-ui
 ```
 
 ## Project structure
@@ -97,6 +111,7 @@ server/               # Backend
 └── utils/            # Shared server utilities (db connection, etc.)
 
 src/volt/             # Volt UI components
+layers/gallop-ui/     # gallop-ui, the shared UI layer (git subtree)
 ```
 
 ## Deployment

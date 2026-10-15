@@ -3,6 +3,8 @@
 
 /* Ensure Tailwind scans Volt component sources for class names */
 @source "../../../src/volt";
+/* ...and the shared UI layer's (layers/gallop-ui, see its README) */
+@source "../../../layers/gallop-ui/components";
 
 /* Semantic surface tokens (zinc-first). Write `bg-surface`, `text-fg`,
    `border-line` ONCE — they flip automatically under prefers-color-scheme

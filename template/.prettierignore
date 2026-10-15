@@ -6,6 +6,9 @@ server/db/migrations/
 # Volt components (from volt-vue)
 src/volt/
 
+# gallop-ui, the shared UI layer: formatted in its own repo
+layers/gallop-ui/
+
 # Non-code files
 *.md
 *.yml

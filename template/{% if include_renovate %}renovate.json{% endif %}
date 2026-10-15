@@ -13,6 +13,17 @@
   "internalChecksFilter": "strict",
   "rebaseWhen": "behind-base-branch",
   "copier": { "enabled": false },
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/vendor/**",
+    "**/examples/**",
+    "**/__tests__/**",
+    "**/test/**",
+    "**/tests/**",
+    "**/__fixtures__/**",
+    "layers/gallop-ui/**"
+  ],
   "packageRules": [
     {
       "description": "@gallopsystems/agent-skills is owned by the template and delivered via `copier update` (the template's Renovate bumps it, auto-merges, and cuts a release). This repo must NOT bump it, or the two fight on every template update.",
