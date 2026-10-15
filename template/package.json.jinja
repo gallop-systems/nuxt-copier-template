@@ -21,10 +21,16 @@
     "db:seed:make": "kysely seed:make",
     "db:codegen": "kysely-codegen --url $NUXT_DATABASE_URL --out-file server/db/db.d.ts --dialect postgres --date-parser string && node scripts/inject-table-comments.mjs $NUXT_DATABASE_URL server/db/db.d.ts",
     "typecheck": "nuxt typecheck",
-    "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
+    "lint": "oxlint --ignore-pattern 'layers/gallop-ui/**'",
+    "lint:fix": "oxlint --fix --ignore-pattern 'layers/gallop-ui/**'",
     "fmt": "oxfmt",
-    "fmt:check": "oxfmt --check"
+    "fmt:check": "oxfmt --check",
+    "ui:add": "node scripts/gallop-ui.mjs add",
+    "ui:pull": "node scripts/gallop-ui.mjs pull",
+    "ui:push": "node scripts/gallop-ui.mjs push",
+    "ui:version": "node scripts/gallop-ui.mjs version",
+    "ui:test": "node scripts/gallop-ui.mjs test",
+    "ui:check": "node scripts/gallop-ui.mjs check"
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.10.0",
@@ -35,6 +41,7 @@
     "nuxt-auth-utils": "^0.5.30",
     "pg": "^8.16.3",
     "primevue": "^4.5.4",
+    "reka-ui": "^2.10.5",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "tailwindcss-primeui": "^0.6.1",

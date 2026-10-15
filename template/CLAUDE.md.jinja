@@ -39,6 +39,7 @@ yarn build                  # Production build
 - `app/` - Frontend (pages, components, assets)
 - `server/` - Backend (API handlers, database, test utilities)
 - `src/volt/` - Volt UI components (PrimeVue unstyled + Tailwind)
+- `layers/gallop-ui/` - gallop-ui, Gallop's shared UI layer (a git subtree; see below)
 
 **Server imports:** use the `#server` alias for server-to-server imports
 (`import { PREVIEW_ANCHOR_USER } from "#server/utils/preview"`), not the app-root
@@ -46,6 +47,27 @@ yarn build                  # Production build
 backend vitest maps it in `vitest.config.ts`. Use `#server/test-utils` for the
 test-utils barrel too — the app-root `~` alias resolves to `app/` under the
 server tsconfig project, so `~/server/...` fails `yarn typecheck` on server code.
+
+### Shared UI (gallop-ui)
+`layers/gallop-ui` is gallop-ui, the UI layer every Gallop app shares. It is a Nuxt layer whose
+components (e.g. `<SegmentedControl>`) register automatically. It's being built up to replace the
+Volt components and the per-app copies of composites. **Before building any UI**, read
+`layers/gallop-ui/CATALOGUE.md` and `layers/gallop-ui/CLAUDE.md`, and work down this list:
+use a layer component as it is (restyled with `pt` if needed) → extend it in the layer → compose
+layer components → build something new (in the layer if another app could use it).
+
+- **Look per app:** colours come from this app's tokens (`layers/gallop-ui/TOKENS.md`); app-wide
+  classes go in `app/app.config.ts` under `gallopUi.pt.<Component>`; one-off classes in the `pt` prop.
+- **Never shadow:** no `app/components` file may register under a layer component's name.
+  Adopting a layer component means deleting the app's own copy in the same change.
+- **Changing the layer:** edit files in `layers/gallop-ui` in a commit of their own, with no app files
+  and a client-neutral message (the layer goes to every client). Send it back with
+  `yarn ui:push <branch>` and open a PR in gallop-systems/gallop-ui.
+- **Updating:** `yarn ui:pull` (latest release) or `yarn ui:pull vX.Y.Z`. Read the layer's
+  CHANGELOG.md first. `yarn ui:version` shows the current one.
+- If `layers/gallop-ui` is missing, add it with `yarn ui:add`.
+
+The lefthook pre-commit hook enforces the shadowing and separate-commit rules (`yarn ui:check`); pre-push runs the layer's tests (`yarn ui:test`).
 
 ### UI Components (Volt)
 Volt components are PrimeVue unstyled components with Tailwind styling. Registered with `Volt` prefix via nuxt.config.ts.

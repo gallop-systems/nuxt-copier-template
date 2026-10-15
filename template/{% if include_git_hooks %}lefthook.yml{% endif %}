@@ -1,5 +1,9 @@
 pre-commit:
   commands:
+    # layers/gallop-ui changes go in commits of their own (they're pushed back
+    # to gallop-ui), and no app component may shadow a layer component.
+    gallop-ui:
+      run: yarn ui:check --staged
     fmt:
       glob: "*.{ts,tsx,vue,js,jsx}"
       run: yarn fmt
@@ -24,6 +28,11 @@ pre-push:
         - rebase
     typecheck:
       run: yarn typecheck
+      skip:
+        - merge
+        - rebase
+    gallop-ui-test:
+      run: yarn ui:test
       skip:
         - merge
         - rebase

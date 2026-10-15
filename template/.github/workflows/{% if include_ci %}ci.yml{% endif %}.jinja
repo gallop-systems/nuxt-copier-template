@@ -103,6 +103,8 @@ jobs:
       - run: yarn test:frontend:run
         env:
           NODE_OPTIONS: --experimental-strip-types
+      # The shared UI layer's own tests, against this app's dependencies.
+      - run: yarn ui:check && yarn ui:test
 
   build:
     runs-on: ubuntu-latest

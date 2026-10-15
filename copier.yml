@@ -2,6 +2,21 @@ _subdirectory: template
 _templates_suffix: .jinja
 _skip_if_exists:
   - ".env"
+# Copier's defaults come first: setting _exclude replaces them.
+_exclude:
+  - "copier.yaml"
+  - "copier.yml"
+  - "~*"
+  - "*.py[co]"
+  - "__pycache__"
+  - ".git"
+  - ".DS_Store"
+  - ".svn"
+  # New projects use gallop-ui's SegmentedControl instead. Existing apps keep
+  # their SlidingTabs through updates until they adopt the layer and delete it.
+  # (_copier_operation is set here but not in file names, hence not a
+  # conditional file name like lefthook.yml's.)
+  - "{% if _copier_operation == 'copy' %}app/components/SlidingTabs.vue{% endif %}"
 
 # Questions
 project_name:
@@ -76,6 +91,11 @@ _tasks:
     when: "{{ _copier_operation == 'copy' }}"
   # Initialize git repo (must come before lefthook install)
   - command: "git init && git add -A && git commit -m 'Initial scaffold from gallop-template'"
+    when: "{{ _copier_operation == 'copy' }}"
+  # Add gallop-ui, the shared UI layer, as a git subtree at layers/gallop-ui (its
+  # own commit). Needs read access to gallop-systems/gallop-ui; without it the
+  # scaffold carries on, and `yarn ui:add` adds it later.
+  - command: "node scripts/gallop-ui.mjs add || echo 'Could not add gallop-ui (no access?). Run: yarn ui:add'"
     when: "{{ _copier_operation == 'copy' }}"
   # Install lefthook (conditional, requires git repo)
   - command: "npx lefthook install"
