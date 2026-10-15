@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.25.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.24.0...v1.25.0) (2026-10-15)
+
+
+### Features
+
+* **template:** form-control tokens for gallop-ui's Input and Textarea ([#105](https://github.com/gallop-systems/nuxt-copier-template/issues/105)) ([9ac0f6a](https://github.com/gallop-systems/nuxt-copier-template/commit/9ac0f6a487833b836368aa10980c3ea90e93b1b0))
+
 ## [1.24.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.23.1...v1.24.0) (2026-10-15)
 
 
