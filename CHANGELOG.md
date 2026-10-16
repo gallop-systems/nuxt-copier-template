@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.27.0...v1.28.0) (2026-10-16)
+
+
+### Features
+
+* **template:** declare @internationalized/date for gallop-ui's Calendar and InputDate ([#112](https://github.com/gallop-systems/nuxt-copier-template/issues/112)) ([042b8ae](https://github.com/gallop-systems/nuxt-copier-template/commit/042b8aeb61c49cd0282d9825bc6d1ddd41ede6f9))
+
 ## [1.27.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.26.0...v1.27.0) (2026-10-16)
 
 
