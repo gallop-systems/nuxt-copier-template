@@ -2,6 +2,9 @@ _subdirectory: template
 _templates_suffix: .jinja
 _skip_if_exists:
   - ".env"
+  # An app owns its app.config.ts (gallopUi.pt, its looks). The template writes
+  # it only into a new app; `copier update` never touches an existing one.
+  - "app/app.config.ts"
 # Copier's defaults come first: setting _exclude replaces them.
 _exclude:
   - "copier.yaml"
@@ -44,6 +47,12 @@ auth_provider:
   # Migrates existing repos on `copier update`: the old bool answer is still in
   # context (true -> google, false -> none); fresh copies default to google.
   default: "{{ 'google' if include_google_oauth | default(true) else 'none' }}"
+
+time_zone:
+  type: str
+  help: "The app's time zone (IANA name, e.g. America/New_York). Times show in it, on the server and in the browser, via gallopUi.timeZone"
+  default: "America/New_York"
+  validator: "{% if not (time_zone | regex_search('^[A-Za-z]+(/[A-Za-z0-9_+-]+){0,2}$')) %}Use an IANA time zone name such as America/New_York{% endif %}"
 
 include_ci:
   type: bool
