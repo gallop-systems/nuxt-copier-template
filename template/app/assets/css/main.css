@@ -52,6 +52,12 @@
      Volt dialog uses. The dark block below flips them. */
   --color-line-panel: var(--p-surface-200); /* a panel's outline */
   --color-on-surface: var(--p-surface-700); /* running text on a surface */
+
+  /* The chosen item in a list (gallop-ui's Select). PrimeVue's highlight colours already flip in
+     dark mode, so there is no entry in the dark block. */
+  --color-highlight: var(--p-highlight-background);
+  --color-highlight-emphasis: var(--p-highlight-focus-background); /* ...while hovered or focused */
+  --color-on-highlight: var(--p-highlight-color);
 }
 
 /* Primary palette (zinc) */
