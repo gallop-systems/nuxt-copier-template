@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.27.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.26.0...v1.27.0) (2026-10-16)
+
+
+### Features
+
+* **template:** handle token for gallop-ui's Switch ([#110](https://github.com/gallop-systems/nuxt-copier-template/issues/110)) ([0a51cf0](https://github.com/gallop-systems/nuxt-copier-template/commit/0a51cf074aad0b27a880ce1fef7a7969b91a02e2))
+
 ## [1.26.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.25.0...v1.26.0) (2026-10-16)
 
 
