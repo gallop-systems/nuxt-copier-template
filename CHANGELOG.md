@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.29.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.28.0...v1.29.0) (2026-10-16)
+
+
+### Features
+
+* **template:** declare @tanstack/vue-table for gallop-ui's DataTable ([#114](https://github.com/gallop-systems/nuxt-copier-template/issues/114)) ([86cb04a](https://github.com/gallop-systems/nuxt-copier-template/commit/86cb04a4b70ef7c9624d88ce2e69788429d5d142))
+
 ## [1.28.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.27.0...v1.28.0) (2026-10-16)
 
 
