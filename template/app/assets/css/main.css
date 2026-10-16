@@ -47,6 +47,11 @@
   --color-on-field: var(--p-surface-700); /* text in a field */
   --color-line-strong: var(--p-surface-300); /* a field's border */
   --color-line-strong-hover: var(--p-surface-400); /* a field's border, hovered */
+
+  /* Panels (gallop-ui's Modal, then Card and popups), mapped onto the PrimeVue colours the
+     Volt dialog uses. The dark block below flips them. */
+  --color-line-panel: var(--p-surface-200); /* a panel's outline */
+  --color-on-surface: var(--p-surface-700); /* running text on a surface */
 }
 
 /* Primary palette (zinc) */
@@ -126,6 +131,8 @@
     --color-on-field: var(--p-surface-0);
     --color-line-strong: var(--p-surface-700);
     --color-line-strong-hover: var(--p-surface-600);
+    --color-line-panel: var(--p-surface-700);
+    --color-on-surface: var(--p-surface-0);
 
     --p-primary-color: var(--p-surface-0);
     --p-primary-contrast-color: var(--p-surface-950);
