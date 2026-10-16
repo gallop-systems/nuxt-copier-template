@@ -58,6 +58,9 @@
   --color-highlight: var(--p-highlight-background);
   --color-highlight-emphasis: var(--p-highlight-focus-background); /* ...while hovered or focused */
   --color-on-highlight: var(--p-highlight-color);
+
+  /* The knob of a control you slide or drag (gallop-ui's Switch thumb). The dark block below flips it. */
+  --color-handle: var(--p-surface-0);
 }
 
 /* Primary palette (zinc) */
@@ -139,6 +142,7 @@
     --color-line-strong-hover: var(--p-surface-600);
     --color-line-panel: var(--p-surface-700);
     --color-on-surface: var(--p-surface-0);
+    --color-handle: var(--p-surface-400);
 
     --p-primary-color: var(--p-surface-0);
     --p-primary-contrast-color: var(--p-surface-950);
