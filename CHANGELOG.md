@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.29.0...v1.30.0) (2026-10-16)
+
+
+### Features
+
+* **template:** ask for the app's time zone; drop useFormatters for gallop-ui's formatters ([#116](https://github.com/gallop-systems/nuxt-copier-template/issues/116)) ([20f1146](https://github.com/gallop-systems/nuxt-copier-template/commit/20f11462175c3abc6e11ee7445fed4218757cc41))
+
 ## [1.29.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.28.0...v1.29.0) (2026-10-16)
 
 
