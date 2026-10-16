@@ -1,0 +1,9 @@
+// App-wide settings for gallop-ui (layers/gallop-ui). Looks go under `gallopUi.pt.<Component>`
+// (README of the layer, "Customizing").
+export default defineAppConfig({
+  gallopUi: {
+    // The zone times are shown in: formatDateTime, formatTime, formatRelative and DateText.
+    // Server and browser read the same value, so they print the same text.
+    timeZone: "{{ time_zone }}",
+  },
+});

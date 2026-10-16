@@ -6,7 +6,7 @@
         <h1 class="text-lg font-semibold text-fg">{{ projectName }}</h1>
       </div>
       <div class="flex items-center gap-4">
-        <VoltAvatar v-if="user" :label="initials" shape="circle" />
+        <Avatar v-if="user" :alt="name" />
         <VoltButton v-if="user" label="Log out" severity="secondary" size="small" @click="logout" />
       </div>
     </div>
@@ -17,11 +17,7 @@
 <script setup lang="ts">
 const projectName = "{{ project_name }}";
 const { user, clear: logout } = useUserSession();
-const { getInitials } = useFormatters();
 
-const initials = computed(() => {
-  if (!user.value) return "";
-  const name = `${user.value.first_name ?? ""} ${user.value.last_name ?? ""}`.trim();
-  return getInitials(name);
-});
+// <Avatar> shows the initials of `alt`, the person's name.
+const name = computed(() => `${user.value?.first_name ?? ""} ${user.value?.last_name ?? ""}`.trim());
 </script>

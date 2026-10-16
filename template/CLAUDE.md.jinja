@@ -67,6 +67,12 @@ layer components → build something new (in the layer if another app could use 
   CHANGELOG.md first. `yarn ui:version` shows the current one.
 - If `layers/gallop-ui` is missing, add it with `yarn ui:add`.
 
+- **Formatting dates, times, money and numbers:** use the layer's auto-imported `formatDate`, `formatDateTime`,
+  `formatRelative`, `formatCurrency`, `formatNumber` and the rest (`layers/gallop-ui/FORMATTERS.md`), not
+  `Intl`, `toLocaleString` or date-fns `format()` in a component. They work in server code too. Times show in
+  `gallopUi.timeZone` (`app/app.config.ts`, set from the time zone chosen when the app was created: `{{ time_zone }}`), so the
+  server and the browser print the same text; a `"2025-01-28"` day is never shifted. Pass `timeZone` when it differs per user.
+
 The lefthook pre-commit hook enforces the shadowing and separate-commit rules (`yarn ui:check`); pre-push runs the layer's tests (`yarn ui:test`).
 
 ### UI Components (Volt)
