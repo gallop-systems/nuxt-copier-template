@@ -19,5 +19,7 @@ const projectName = "{{ project_name }}";
 const { user, clear: logout } = useUserSession();
 
 // <Avatar> shows the initials of `alt`, the person's name.
-const name = computed(() => `${user.value?.first_name ?? ""} ${user.value?.last_name ?? ""}`.trim());
+const name = computed(() =>
+  `${user.value?.first_name ?? ""} ${user.value?.last_name ?? ""}`.trim(),
+);
 </script>
