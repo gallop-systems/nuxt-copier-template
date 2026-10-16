@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.26.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.25.0...v1.26.0) (2026-10-16)
+
+
+### Features
+
+* **template:** highlight tokens for gallop-ui's Select ([#108](https://github.com/gallop-systems/nuxt-copier-template/issues/108)) ([36c57d1](https://github.com/gallop-systems/nuxt-copier-template/commit/36c57d1c7512d71643cfb03dadea8238bd96657e))
+* **template:** panel tokens for gallop-ui's Modal ([#107](https://github.com/gallop-systems/nuxt-copier-template/issues/107)) ([180c8b5](https://github.com/gallop-systems/nuxt-copier-template/commit/180c8b5650bee4c40374792ae6315b3d308b022e))
+
 ## [1.25.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.24.0...v1.25.0) (2026-10-15)
 
 
