@@ -87,8 +87,11 @@ Its `CATALOGUE.md` lists the components and its `README.md` explains customizing
 ```bash
 yarn ui:version         # the version this app has
 yarn ui:pull            # take the latest release (or: yarn ui:pull vX.Y.Z)
+yarn ui:impact          # before pushing: what a layer edit does to every app on this machine
 yarn ui:push <branch>   # send layer commits back, then open a PR in gallop-ui
 ```
+
+In `yarn dev`, `/_ui` shows every layer component's stories in this app's theme (development only).
 
 ## Project structure
 

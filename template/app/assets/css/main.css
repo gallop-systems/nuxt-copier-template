@@ -16,6 +16,8 @@
    tokens are a small, opinionated app vocabulary, not a replacement for it.
    Light values here; dark values in the @media block near the bottom. */
 @theme {
+  /* The app's UI font is --font-sans, set here and nowhere else (not in a layout): e.g.
+     --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif; Tailwind's system stack until then. */
   --color-canvas: #fafafa; /* zinc-50  — app background */
   --color-surface: #ffffff; /* white    — cards, panels, dialogs */
   --color-surface-muted: #fafafa; /* zinc-50  — subtle fills, row hover */
