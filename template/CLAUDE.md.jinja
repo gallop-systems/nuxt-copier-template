@@ -58,6 +58,11 @@ layer components → build something new (in the layer if another app could use 
 
 - **Look per app:** colours come from this app's tokens (`layers/gallop-ui/TOKENS.md`); app-wide
   classes go in `app/app.config.ts` under `gallopUi.pt.<Component>`; one-off classes in the `pt` prop.
+- **One UI font, set once:** the app's typeface is `--font-sans` in `@theme` in `app/assets/css/main.css`
+  (Tailwind puts it on `<html>`, so every page, layout, overlay and layer component gets it). Never set the
+  font from a layout (`bodyAttrs` class, a wrapper `font-*`) or on `html`/`body` by hand. A face for one part of
+  the app (a marketing site's headlines, a brand wordmark) is a `--font-<name>` token used as a class on those
+  elements.
 - **Never shadow:** no `app/components` file may register under a layer component's name.
   Adopting a layer component means deleting the app's own copy in the same change.
 - **Changing the layer:** edit files in `layers/gallop-ui` in a commit of their own, with no app files
