@@ -7,6 +7,9 @@
 //   yarn ui:pull [vX.Y.Z]     take a newer release (default: the latest)
 //   yarn ui:push <branch>     send commits made to layers/gallop-ui back, as a
 //                             branch of gallop-ui to open a PR from
+//   yarn ui:impact [options]  before ui:push: what an edit to layers/gallop-ui does to
+//                             every app on this machine (call sites, types,
+//                             before/after screenshots); the layer's docs/playground.md
 //   yarn ui:version           the version this app has
 //   yarn ui:test              run the layer's own tests
 //   yarn ui:check [--staged]  the guards lefthook runs: no app component named
@@ -166,6 +169,13 @@ switch (command) {
     if (!branch) fail("Usage: yarn ui:push <branch-name-for-gallop-ui>");
     run("git", ["subtree", "push", `--prefix=${PREFIX}`, REMOTE, branch]);
     console.log(`\nPushed. Open a PR in gallop-systems/gallop-ui from ${branch}.`);
+    break;
+  }
+  case "impact": {
+    const script = join(layer, "scripts", "impact.mjs");
+    if (!existsSync(script))
+      fail(`This app's ${PREFIX} (version ${version()}) has no ui:impact yet. Take a newer one with \`yarn ui:pull\`.`);
+    run("node", [script, ...args]);
     break;
   }
   case "version":
