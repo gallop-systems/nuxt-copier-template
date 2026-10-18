@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.31.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.30.0...v1.31.0) (2026-10-18)
+
+
+### Features
+
+* **template:** declare @vueuse/router for URL-synced state (useRouteQuery) ([#118](https://github.com/gallop-systems/nuxt-copier-template/issues/118)) ([4dedc00](https://github.com/gallop-systems/nuxt-copier-template/commit/4dedc001e6c12bcbc93b2f197e995a439311ec5b))
+* **template:** declare pluralize for gallop-ui's noun helper ([#121](https://github.com/gallop-systems/nuxt-copier-template/issues/121)) ([f71cb3d](https://github.com/gallop-systems/nuxt-copier-template/commit/f71cb3d55b8d8e73608c126b73b45b58d031202a))
+* **template:** yarn ui:impact, gallop-ui's cross-app impact preview ([#119](https://github.com/gallop-systems/nuxt-copier-template/issues/119)) ([1a01b23](https://github.com/gallop-systems/nuxt-copier-template/commit/1a01b23943b949292b25c04091f3e9dbe5edda1d))
+* **template:** yarn ui:migrate forwards to the layer's migration kit ([#122](https://github.com/gallop-systems/nuxt-copier-template/issues/122)) ([b0b1e52](https://github.com/gallop-systems/nuxt-copier-template/commit/b0b1e52bb6c75083d98ef2c49bf5a861860437b2))
+
 ## [1.30.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.29.0...v1.30.0) (2026-10-16)
 
 
