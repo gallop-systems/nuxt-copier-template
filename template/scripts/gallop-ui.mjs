@@ -10,6 +10,9 @@
 //   yarn ui:impact [options]  before ui:push: what an edit to layers/gallop-ui does to
 //                             every app on this machine (call sites, types,
 //                             before/after screenshots); the layer's docs/playground.md
+//   yarn ui:migrate [options] after a breaking ui:pull: rewrite app/ for it and write a
+//                             checklist (--dry shows the diff first); the layer's
+//                             docs/migrating-to-0.18.md
 //   yarn ui:version           the version this app has
 //   yarn ui:test              run the layer's own tests
 //   yarn ui:check [--staged]  the guards lefthook runs: no app component named
@@ -190,6 +193,15 @@ switch (command) {
   case "check":
     check(args.includes("--staged"));
     break;
+  case "migrate": {
+    const script = join(layer, "scripts", "migrate.mjs");
+    if (!existsSync(script))
+      fail(
+        `This app's ${PREFIX} (version ${version()}) has no ui:migrate yet. Take 0.18 or later with \`yarn ui:pull\`.`,
+      );
+    run("node", [script, ...args]);
+    break;
+  }
   default:
     // The comment block at the top of this file is the help.
     console.log(
