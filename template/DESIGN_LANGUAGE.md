@@ -54,35 +54,32 @@ Mono:         font-mono text-sm (for IDs, codes)
 
 **Primary**
 ```vue
-<VoltButton
+<Button
   label="Action"
-  pt:root:class="px-4 py-2.5 bg-zinc-900 text-white rounded-xl hover:bg-zinc-800 transition-colors text-sm font-medium"
+  class="px-4 py-2.5 bg-zinc-900 text-white rounded-xl hover:bg-zinc-800 transition-colors text-sm font-medium"
 />
 ```
 
 **Secondary**
 ```vue
-<VoltButton
+<Button
   label="Cancel"
-  pt:root:class="px-4 py-2.5 bg-zinc-100 text-zinc-700 rounded-xl hover:bg-zinc-200 transition-colors text-sm font-medium"
+  class="px-4 py-2.5 bg-zinc-100 text-zinc-700 rounded-xl hover:bg-zinc-200 transition-colors text-sm font-medium"
 />
 ```
 
 **Danger**
 ```vue
-<VoltButton
+<Button
   label="Delete"
-  pt:root:class="px-4 py-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors text-sm font-medium"
+  class="px-4 py-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors text-sm font-medium"
 />
 ```
 
 ### Cards
 
 ```vue
-<VoltCard
-  pt:root:class="bg-white rounded-2xl border border-zinc-200/80 shadow-none"
-  pt:body:class="p-6"
->
+<Card class="bg-white rounded-2xl border border-zinc-200/80 shadow-none p-6">
 ```
 
 Interactive cards add hover state:
@@ -94,54 +91,55 @@ hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-200/50 transition-all
 
 ```vue
 <!-- User avatar -->
-<VoltAvatar
-  :label="initials"
-  pt:root:class="w-10 h-10 rounded-xl bg-zinc-200 text-zinc-700 font-semibold text-sm"
+<Avatar
+  :text="initials"
+  alt="Name"
+  class="w-10 h-10 rounded-xl bg-zinc-200 text-zinc-700 font-semibold text-sm"
 />
 
 <!-- Header icon -->
-<VoltAvatar
-  pt:root:class="w-11 h-11 rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-950 text-white"
->
-  <template #icon><Icon name="lucide:users" /></template>
-</VoltAvatar>
+<Avatar
+  icon="lucide:users"
+  alt="Users"
+  class="w-11 h-11 rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-950 text-white"
+/>
 ```
 
 ### Tags/Badges
 
 ```vue
 <!-- Status badge -->
-<VoltTag
-  severity="success"
-  pt:root:class="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-medium"
+<Pill
+  label="Active"
+  color="success"
+  class="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-medium"
 />
 
 <!-- Neutral badge -->
-<VoltTag
-  pt:root:class="inline-flex items-center px-2.5 py-1 rounded-lg bg-zinc-100 text-zinc-600 text-xs font-medium"
+<Pill
+  label="Draft"
+  class="inline-flex items-center px-2.5 py-1 rounded-lg bg-zinc-100 text-zinc-600 text-xs font-medium"
 />
 ```
 
 ### Inputs
 
 ```vue
-<VoltInputText
-  pt:root:class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-300 focus:bg-white transition-all"
+<Input
+  class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-300 focus:bg-white transition-all"
 />
 ```
 
 ### Tables (DataTable)
 
 ```vue
-<VoltDataTable
+<DataTable
+  :columns="columns"
+  :rows="rows"
   :pt="{
     table: { class: 'w-full' },
-    thead: { class: 'bg-zinc-50' },
-    bodyRow: { class: 'bg-white even:bg-zinc-50/50 hover:bg-zinc-100 transition-colors' },
-    column: {
-      headerCell: { class: 'py-3.5 px-5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider border-b border-zinc-200 bg-zinc-50' },
-      bodyCell: { class: 'py-4 px-5 border-0' },
-    },
+    headerCell: { class: 'py-3.5 px-5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider border-b border-zinc-200 bg-zinc-50' },
+    bodyCell: { class: 'py-4 px-5 border-0' },
   }"
 />
 ```
@@ -149,21 +147,13 @@ hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-200/50 transition-all
 ### Dialogs
 
 ```vue
-<VoltDialog
-  pt:root:class="max-w-md w-full mx-4 rounded-2xl border border-zinc-200 bg-white"
-  pt:header:class="p-5 border-b border-zinc-100"
-  pt:title:class="text-lg font-semibold text-zinc-900"
-  pt:content:class="p-5"
+<Modal
+  v-model:open="open"
+  title="Edit contract"
+  class="max-w-md w-full mx-4 rounded-2xl border border-zinc-200 bg-white"
 >
-  <template #closebutton="{ closeCallback }">
-    <button
-      @click="closeCallback"
-      class="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors"
-    >
-      <Icon name="lucide:x" class="text-zinc-600 text-sm" />
-    </button>
-  </template>
-</VoltDialog>
+  …
+</Modal>
 ```
 
 ### Icon Buttons (circular)
@@ -249,13 +239,11 @@ Icons are bundled offline (no runtime API calls) — see `nuxt.config.ts`.
 - Lucide is monochrome and has **no brand logos**. For brand marks (OAuth
   buttons, etc.) use the `simple-icons` set, which also tints with
   `currentColor`: `<Icon name="simple-icons:google" />`.
-- For a PrimeVue/Volt component that takes an icon, pass it via the `#icon`
-  slot rather than the `icon` prop:
+- A gallop-ui component that takes an icon (`Button`, `Avatar`) takes any Iconify name in its
+  `icon` prop, brand marks included:
 
   ```vue
-  <VoltButton label="Sign in with Google" @click="signIn">
-    <template #icon><Icon name="simple-icons:google" /></template>
-  </VoltButton>
+  <Button label="Sign in with Google" icon="simple-icons:google" @click="signIn" />
   ```
 
 ---
@@ -266,8 +254,8 @@ Animation is deliberately minimal. Two tools cover almost everything:
 
 - **`transition-colors`** (Tailwind) for hover/active state changes — already
   the norm across buttons, cards, and inputs.
-- **PrimeVue's built-in transitions** for overlays (Dialog, Drawer, Toast,
-  Menu) — no extra work needed.
+- **gallop-ui's built-in transitions** for overlays (Modal, Drawer, Toaster,
+  DropdownMenu) — no extra work needed.
 
 For DOM changes that aren't covered above — list rows being added/removed,
 conditional fields appearing, panels expanding — use **AutoAnimate**. The
@@ -295,5 +283,5 @@ Keep motion in service of clarity, not decoration:
 - Don't use transforms (`-translate-y`) for hover states
 - Don't use borders between table rows
 - Don't use blue/purple accent colors - stick to zinc
-- Don't use the default Volt component styles without customization
+- Don't use the default gallop-ui component styles without customization
 - Don't add decorative entrance/scroll/spring animations — use AutoAnimate only for layout changes

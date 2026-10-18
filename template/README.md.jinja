@@ -6,7 +6,7 @@
 
 - **Framework:** [Nuxt 4](https://nuxt.com/) (Vue 3, TypeScript)
 - **Styling:** [Tailwind CSS 4](https://tailwindcss.com/)
-- **UI Components:** gallop-ui, Gallop's shared UI layer (`layers/gallop-ui`), and [Volt](https://volt.primevue.org/) (PrimeVue + Tailwind) while gallop-ui replaces it
+- **UI Components:** gallop-ui, Gallop's shared UI layer (`layers/gallop-ui`)
 - **Database:** PostgreSQL with [Kysely](https://kysely.dev/) (type-safe query builder)
 - **Validation:** [Zod](https://zod.dev/)
 - **Auth:** [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils) (session-based{% if auth_provider == 'google' %}, Google OAuth{% elif auth_provider == 'microsoft' %}, Microsoft OAuth{% endif %})
@@ -113,7 +113,6 @@ server/               # Backend
 ├── test-utils/       # Test helpers, factories, mocks
 └── utils/            # Shared server utilities (db connection, etc.)
 
-src/volt/             # Volt UI components
 layers/gallop-ui/     # gallop-ui, the shared UI layer (git subtree)
 ```
 

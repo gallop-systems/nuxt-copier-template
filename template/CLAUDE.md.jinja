@@ -38,7 +38,6 @@ yarn build                  # Production build
 ### Nuxt 4 Structure
 - `app/` - Frontend (pages, components, assets)
 - `server/` - Backend (API handlers, database, test utilities)
-- `src/volt/` - Volt UI components (PrimeVue unstyled + Tailwind)
 - `layers/gallop-ui/` - gallop-ui, Gallop's shared UI layer (a git subtree; see below)
 
 **Server imports:** use the `#server` alias for server-to-server imports
@@ -50,8 +49,8 @@ server tsconfig project, so `~/server/...` fails `yarn typecheck` on server code
 
 ### Shared UI (gallop-ui)
 `layers/gallop-ui` is gallop-ui, the UI layer every Gallop app shares. It is a Nuxt layer whose
-components (e.g. `<SegmentedControl>`) register automatically. It's being built up to replace the
-Volt components and the per-app copies of composites. **Before building any UI**, read
+components (e.g. `<SegmentedControl>`) register automatically, and it replaces per-app copies of
+components and composites. **Before building any UI**, read
 `layers/gallop-ui/CATALOGUE.md` and `layers/gallop-ui/CLAUDE.md`, and work down this list:
 use a layer component as it is (restyled with `pt` if needed) → extend it in the layer → compose
 layer components → build something new (in the layer if another app could use it).
@@ -82,20 +81,15 @@ layer components → build something new (in the layer if another app could use 
 
 The lefthook pre-commit hook enforces the shadowing and separate-commit rules (`yarn ui:check`); pre-push runs the layer's tests (`yarn ui:test`).
 
-### UI Components (Volt)
-Volt components are PrimeVue unstyled components with Tailwind styling. Registered with `Volt` prefix via nuxt.config.ts.
+### UI Components (gallop-ui)
+Every component is gallop-ui's (`<Button>`, `<Card>`, `<Input>`, `<Select>`, `<Modal>`, `<DataTable>`, ...); there is
+no other component library, so look in `layers/gallop-ui/CATALOGUE.md` before reaching for anything else.
 
-**Customization:** Use `pt:section:class` syntax for pass-through styling:
+**Customization:** `class` is shorthand for `pt.root`; other sections go through `pt`:
 ```vue
-<VoltButton pt:root:class="bg-zinc-900 hover:bg-zinc-800" />
-<VoltCard pt:root:class="rounded-2xl" pt:body:class="p-6" />
+<Button class="rounded-full" />
+<Card title="Details" :pt="{ header: 'border-b' }" />
 ```
-
-Available: VoltAvatar, VoltButton, VoltCard, VoltConfirmDialog, VoltDataTable, VoltDatePicker, VoltDialog, VoltInputMask, VoltInputText, VoltMessage, VoltMultiSelect, VoltPassword, VoltSecondaryButton, VoltSelect, VoltTag, VoltTextarea, VoltToast
-
-**VoltDatePicker typed input:** besides `dateFormat`, a single date (no time) also accepts typed `M/D/YYYY`
-(US order) and `YYYY-MM-DD`. Text that still isn't a date on blur reverts to the saved value and shows the
-invalid border until the field is focused again or a date is picked.
 
 ### Database (Kysely + PostgreSQL)
 - `server/utils/db.ts` - Database connection, exports `db` and `useDatabase()`

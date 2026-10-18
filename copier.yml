@@ -82,9 +82,6 @@ _tasks:
   # Install dependencies (skip builds to avoid nuxt prepare before env is ready)
   - command: "yarn install"
     when: "{{ _copier_operation == 'copy' }}"
-  # Install Volt components
-  - command: "npx volt-vue add Button SecondaryButton Card InputText Password Select Textarea Avatar Tag DataTable Dialog ConfirmDialog Message Toast"
-    when: "{{ _copier_operation == 'copy' }}"
   # Create and populate users migration
   - command: "yarn db:migrate:make create_users_table"
     when: "{{ _copier_operation == 'copy' }}"

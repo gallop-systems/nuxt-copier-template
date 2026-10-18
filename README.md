@@ -1,12 +1,12 @@
 # copier-nuxt
 
-A [Copier](https://copier.readthedocs.io/) template for full-stack Nuxt 4 applications with Kysely, PostgreSQL, Tailwind CSS, and Volt (PrimeVue) components.
+A [Copier](https://copier.readthedocs.io/) template for full-stack Nuxt 4 applications with Kysely, PostgreSQL, Tailwind CSS, and the gallop-ui component layer.
 
 ## What you get
 
 - **Nuxt 4** with Vue 3, TypeScript, and Tailwind CSS 4
 - **Kysely** for type-safe SQL queries with auto-generated types from your database
-- **Volt** component library (PrimeVue + Tailwind) with a zinc-first design system
+- **gallop-ui**, Gallop's shared Nuxt UI layer (`layers/gallop-ui`, a git subtree), on a zinc-first token set
 - **PostgreSQL** with migrations, codegen, and transaction-based test isolation
 - **Vitest** for both backend and frontend tests
 - **Optional:** Google OAuth, GitHub Actions CI, lefthook git hooks
@@ -46,10 +46,10 @@ After answering, Copier automatically:
 1. Creates the PostgreSQL databases (`<database_name>` and `<database_name>-test`)
 2. Copies `.env.example` to `.env`
 3. Runs `yarn install`
-4. Installs Volt UI components
-5. Creates and runs the initial `users` migration
-6. Generates TypeScript types from the database schema
-7. Initializes a git repo with an initial commit
+4. Creates and runs the initial `users` migration
+5. Generates TypeScript types from the database schema
+6. Initializes a git repo with an initial commit
+7. Adds gallop-ui as a git subtree at `layers/gallop-ui` (needs access to gallop-systems/gallop-ui)
 
 ## Requiring CI to pass before merge
 
@@ -119,7 +119,6 @@ copier-nuxt/
 └── template/           # Everything inside here gets copied
     ├── app/            # Frontend: pages, components, composables, layouts
     ├── server/         # Backend: API routes, DB, middleware, test utils
-    ├── src/volt/       # Volt UI components (populated by post-copy task)
     ├── scripts/        # Build/setup scripts
     ├── package.json.jinja
     ├── nuxt.config.ts.jinja
