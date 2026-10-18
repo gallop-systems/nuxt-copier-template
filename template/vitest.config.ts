@@ -9,6 +9,10 @@ export default isFrontendTest
       test: {
         environment: "nuxt",
         globals: true,
+        // Each file boots a Nuxt environment. Under the parallel pre-push load
+        // (typecheck + backend tests) that setup can pass vitest's 10s hook
+        // default and fail whole files with no test-level error.
+        hookTimeout: 30_000,
         include: [
           "app/components/**/*.test.ts",
           "app/pages/**/*.test.ts",
