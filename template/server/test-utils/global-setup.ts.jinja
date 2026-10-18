@@ -11,6 +11,23 @@ function getTestConnectionString(): string {
   return "postgresql://localhost/{{ database_name }}-test";
 }
 
+/** The database in a connection string, without host, user or password: `app-test`. */
+function databaseName(connectionString: string): string {
+  try {
+    return decodeURIComponent(new URL(connectionString).pathname.replace(/^\//, "")) || "(default)";
+  } catch {
+    return "(unparsable URL)";
+  }
+}
+
+function box(lines: string[]): string {
+  const width = Math.max(...lines.map((l) => l.length)) + 2;
+  const row = (l: string) => `│ ${l.padEnd(width - 1)}│`;
+  return ["╭" + "─".repeat(width) + "╮", ...lines.map(row), "╰" + "─".repeat(width) + "╯"].join(
+    "\n",
+  );
+}
+
 export async function setup() {
   const testConnectionString = getTestConnectionString();
   const pool = new Pool({ connectionString: testConnectionString });
@@ -21,17 +38,20 @@ export async function setup() {
   } catch (err: unknown) {
     const pgError = err as { code?: string };
     if (pgError.code === "3D000") {
-      console.error(`
-╭─────────────────────────────────────────────────────────────╮
-│  Error: Database "{{ database_name }}-test" does not exist. │
-│                                                             │
-│  Run this command to create it:                             │
-│                                                             │
-│    createdb {{ database_name }}-test                        │
-│                                                             │
-│  Then re-run your tests.                                    │
-╰─────────────────────────────────────────────────────────────╯
-`);
+      const name = databaseName(testConnectionString);
+      console.error(
+        "\n" +
+          box([
+            `Error: Database "${name}" does not exist.`,
+            "",
+            "Run this command to create it:",
+            "",
+            `  createdb ${name}`,
+            "",
+            "Then re-run your tests.",
+          ]) +
+          "\n",
+      );
       process.exit(1);
     }
     throw err;
@@ -77,7 +97,9 @@ export async function setup() {
   }
 
   const applied = results?.filter((r) => r.status === "Success") ?? [];
-  console.log(`Test DB reset: applied ${applied.length} migrations to {{ database_name }}-test`);
+  console.log(
+    `Test DB reset: applied ${applied.length} migrations to ${databaseName(testConnectionString)}`,
+  );
 
   await db.destroy();
 }

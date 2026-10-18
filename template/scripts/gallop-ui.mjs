@@ -13,6 +13,8 @@
 //   yarn ui:migrate [options] after a breaking ui:pull: rewrite app/ for it and write a
 //                             checklist (--dry shows the diff first); the layer's
 //                             docs/migrating-to-0.18.md
+//   yarn ui:tokens [css]      check a theme CSS file (default app/assets/css/main.css) against the
+//                             layer's token contract: what it is missing, what it still names the old way
 //   yarn ui:version           the version this app has
 //   yarn ui:test              run the layer's own tests
 //   yarn ui:check [--staged]  the guards lefthook runs: no app component named
@@ -181,6 +183,15 @@ switch (command) {
         `This app's ${PREFIX} (version ${version()}) has no ui:impact yet. Take a newer one with \`yarn ui:pull\`.`,
       );
     run("node", [script, ...args]);
+    break;
+  }
+  case "tokens": {
+    const script = join(layer, "scripts", "tokens-check.mjs");
+    if (!existsSync(script))
+      fail(
+        `This app's ${PREFIX} (version ${version()}) has no token check. Take a newer one with \`yarn ui:pull\`.`,
+      );
+    run("node", [script, args[0] ?? "app/assets/css/main.css"]);
     break;
   }
   case "version":
