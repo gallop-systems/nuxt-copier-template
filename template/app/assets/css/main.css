@@ -1,9 +1,7 @@
 @import "tailwindcss";
-@import "tailwindcss-primeui";
 
-/* Ensure Tailwind scans Volt component sources for class names */
-@source "../../../src/volt";
-/* ...and the shared UI layer's (layers/gallop-ui, see its README) */
+/* Ensure Tailwind scans the shared UI layer's component sources for class names
+   (layers/gallop-ui, see its README) */
 @source "../../../layers/gallop-ui/components";
 
 /* Semantic surface tokens (zinc-first). Write `bg-surface`, `text-fg`,
@@ -11,9 +9,8 @@
    (see the dark override below). This is what makes dark mode un-forgettable:
    there is no `dark:` half to omit.
 
-   Use these for YOUR app markup (pages, components). Volt components stay on
-   the `surface-*` scale + `dark:` pairs — they need the full 0–950 ramp; these
-   tokens are a small, opinionated app vocabulary, not a replacement for it.
+   Use these for YOUR app markup (pages, components); gallop-ui's components read
+   the same tokens (layers/gallop-ui/TOKENS.md is the contract).
    Light values here; dark values in the @media block near the bottom. */
 @theme {
   /* The app's UI font is --font-sans, set here and nowhere else (not in a layout): e.g.
@@ -28,95 +25,42 @@
   --color-fg-subtle: #a1a1aa; /* zinc-400 — tertiary text */
   --color-fill: #e4e4e7; /* zinc-200 — neutral solid fills: avatars, tracks, dots, skeletons */
 
-  /* Fills and their states (gallop-ui's Button and other controls). Mapped onto
-     the PrimeVue colours the Volt buttons use, so both look the same while they
-     coexist; the dark block below flips the surface ramp ones. */
-  --color-accent: var(--p-primary-color); /* primary fills (buttons) */
-  --color-accent-hover: var(--p-primary-hover-color);
-  --color-accent-active: var(--p-primary-active-color);
-  --color-on-accent: var(--p-primary-contrast-color); /* text/icon on an accent fill */
-  --color-fill-subtle: var(--p-surface-100); /* secondary button */
-  --color-fill-strong: var(--p-surface-300); /* secondary button, pressed */
-  --color-on-fill: var(--p-surface-600);
-  --color-on-fill-hover: var(--p-surface-700);
-  --color-on-fill-active: var(--p-surface-800);
-  --color-surface-active: var(--p-surface-100); /* quiet button, pressed */
-  --color-fg-quiet: var(--p-surface-500); /* quiet button label; a field's placeholder */
+  /* Fills and their states (gallop-ui's Button and other controls). The dark block below
+     flips them. */
+  --color-accent: #09090b; /* zinc-950 — primary fills (buttons) */
+  --color-accent-hover: #27272a; /* zinc-800 */
+  --color-accent-active: #3f3f46; /* zinc-700 */
+  --color-on-accent: #ffffff; /* text/icon on an accent fill */
+  --color-fill-subtle: #f4f4f5; /* zinc-100 — secondary button */
+  --color-fill-strong: #d4d4d8; /* zinc-300 — secondary button, pressed */
+  --color-on-fill: #52525b; /* zinc-600 */
+  --color-on-fill-hover: #3f3f46; /* zinc-700 */
+  --color-on-fill-active: #27272a; /* zinc-800 */
+  --color-surface-active: #f4f4f5; /* zinc-100 — quiet button, pressed */
+  --color-fg-quiet: #71717a; /* zinc-500 — quiet button label; a field's placeholder */
 
-  /* Form controls (gallop-ui's Input and Textarea), mapped onto the PrimeVue colours the
-     Volt fields use. The dark block below flips them. */
-  --color-field: var(--p-surface-0); /* a field's fill */
-  --color-on-field: var(--p-surface-700); /* text in a field */
-  --color-line-strong: var(--p-surface-300); /* a field's border */
-  --color-line-strong-hover: var(--p-surface-400); /* a field's border, hovered */
+  /* Form controls (gallop-ui's Input, Textarea and Select). */
+  --color-field: #ffffff; /* a field's fill */
+  --color-on-field: #3f3f46; /* zinc-700 — text in a field */
+  --color-line-strong: #d4d4d8; /* zinc-300 — a field's border */
+  --color-line-strong-hover: #a1a1aa; /* zinc-400 — a field's border, hovered */
 
-  /* Panels (gallop-ui's Modal, then Card and popups), mapped onto the PrimeVue colours the
-     Volt dialog uses. The dark block below flips them. */
-  --color-line-panel: var(--p-surface-200); /* a panel's outline */
-  --color-on-surface: var(--p-surface-700); /* running text on a surface */
+  /* Panels (gallop-ui's Modal, Card and popups). */
+  --color-line-panel: #e4e4e7; /* zinc-200 — a panel's outline */
+  --color-on-surface: #3f3f46; /* zinc-700 — running text on a surface */
 
-  /* The chosen item in a list (gallop-ui's Select). PrimeVue's highlight colours already flip in
-     dark mode, so there is no entry in the dark block. */
-  --color-highlight: var(--p-highlight-background);
-  --color-highlight-emphasis: var(--p-highlight-focus-background); /* ...while hovered or focused */
-  --color-on-highlight: var(--p-highlight-color);
+  /* The chosen item in a list (gallop-ui's Select). */
+  --color-highlight: #09090b;
+  --color-highlight-emphasis: #3f3f46; /* ...while hovered or focused */
+  --color-on-highlight: #ffffff;
 
-  /* The knob of a control you slide or drag (gallop-ui's Switch thumb). The dark block below flips it. */
-  --color-handle: var(--p-surface-0);
+  /* The knob of a control you slide or drag (gallop-ui's Switch thumb). */
+  --color-handle: #ffffff;
 }
 
-/* Primary palette (zinc) */
-:root {
-  --p-primary-50: #fafafa;
-  --p-primary-100: #f4f4f5;
-  --p-primary-200: #e4e4e7;
-  --p-primary-300: #d4d4d8;
-  --p-primary-400: #a1a1aa;
-  --p-primary-500: #71717a;
-  --p-primary-600: #52525b;
-  --p-primary-700: #3f3f46;
-  --p-primary-800: #27272a;
-  --p-primary-900: #18181b;
-  --p-primary-950: #09090b;
-
-  --p-surface-0: #ffffff;
-  --p-surface-50: #fafafa;
-  --p-surface-100: #f4f4f5;
-  --p-surface-200: #e4e4e7;
-  --p-surface-300: #d4d4d8;
-  --p-surface-400: #a1a1aa;
-  --p-surface-500: #71717a;
-  --p-surface-600: #52525b;
-  --p-surface-700: #3f3f46;
-  --p-surface-800: #27272a;
-  --p-surface-900: #18181b;
-  --p-surface-950: #09090b;
-
-  --p-content-border-radius: 6px;
-}
-
-/* Semantic tokens — noir (zinc-first) light mode */
-:root {
-  --p-primary-color: var(--p-primary-950);
-  --p-primary-contrast-color: #ffffff;
-  --p-primary-hover-color: var(--p-primary-800);
-  --p-primary-active-color: var(--p-primary-700);
-  --p-content-border-color: var(--p-surface-200);
-  --p-content-hover-background: var(--p-surface-100);
-  --p-content-hover-color: var(--p-surface-800);
-  --p-highlight-background: var(--p-surface-950);
-  --p-highlight-color: #ffffff;
-  --p-highlight-focus-background: var(--p-surface-700);
-  --p-highlight-focus-color: #ffffff;
-  --p-text-color: var(--p-surface-700);
-  --p-text-hover-color: var(--p-surface-800);
-  --p-text-muted-color: var(--p-surface-500);
-  --p-text-hover-muted-color: var(--p-surface-600);
-}
-
-/* Semantic tokens — noir dark mode (follows the OS via prefers-color-scheme,
-   matching Tailwind v4's default `dark:` variant). Primary inverts to light
-   shades so filled buttons/highlights read on dark surfaces. */
+/* Dark mode (follows the OS via prefers-color-scheme, matching Tailwind v4's
+   default `dark:` variant). The accent inverts to light shades so filled
+   buttons/highlights read on dark surfaces. */
 @media (prefers-color-scheme: dark) {
   :root {
     /* Semantic surface tokens — dark values (override the light defaults above).
@@ -131,35 +75,26 @@
     --color-fg-muted: #b4b4bc; /* secondary — ~9:1 on near-black */
     --color-fg-subtle: #8c8c95; /* tertiary  — ~5.5:1 on near-black */
     --color-fill: #3f3f46; /* zinc-700 — reads as a raised surface on dark */
-    --color-fill-subtle: var(--p-surface-800);
-    --color-fill-strong: var(--p-surface-600);
-    --color-on-fill: var(--p-surface-300);
-    --color-on-fill-hover: var(--p-surface-200);
-    --color-on-fill-active: var(--p-surface-100);
-    --color-surface-active: var(--p-surface-700);
-    --color-fg-quiet: var(--p-surface-400);
-    --color-field: var(--p-surface-950);
-    --color-on-field: var(--p-surface-0);
-    --color-line-strong: var(--p-surface-700);
-    --color-line-strong-hover: var(--p-surface-600);
-    --color-line-panel: var(--p-surface-700);
-    --color-on-surface: var(--p-surface-0);
-    --color-handle: var(--p-surface-400);
-
-    --p-primary-color: var(--p-surface-0);
-    --p-primary-contrast-color: var(--p-surface-950);
-    --p-primary-hover-color: var(--p-surface-100);
-    --p-primary-active-color: var(--p-surface-200);
-    --p-content-border-color: var(--p-surface-700);
-    --p-content-hover-background: var(--p-surface-800);
-    --p-content-hover-color: var(--p-surface-0);
-    --p-highlight-background: color-mix(in srgb, var(--p-surface-0), transparent 84%);
-    --p-highlight-color: var(--p-surface-0);
-    --p-highlight-focus-background: color-mix(in srgb, var(--p-surface-0), transparent 76%);
-    --p-highlight-focus-color: var(--p-surface-0);
-    --p-text-color: var(--p-surface-0);
-    --p-text-hover-color: var(--p-surface-0);
-    --p-text-muted-color: var(--p-surface-400);
-    --p-text-hover-muted-color: var(--p-surface-300);
+    --color-fill-subtle: #27272a;
+    --color-fill-strong: #52525b;
+    --color-on-fill: #d4d4d8;
+    --color-on-fill-hover: #e4e4e7;
+    --color-on-fill-active: #f4f4f5;
+    --color-surface-active: #3f3f46;
+    --color-fg-quiet: #a1a1aa;
+    --color-field: #09090b;
+    --color-on-field: #ffffff;
+    --color-line-strong: #3f3f46;
+    --color-line-strong-hover: #52525b;
+    --color-line-panel: #3f3f46;
+    --color-on-surface: #ffffff;
+    --color-handle: #a1a1aa;
+    --color-accent: #ffffff;
+    --color-accent-hover: #f4f4f5;
+    --color-accent-active: #e4e4e7;
+    --color-on-accent: #09090b;
+    --color-highlight: color-mix(in srgb, #ffffff 16%, transparent);
+    --color-highlight-emphasis: color-mix(in srgb, #ffffff 24%, transparent);
+    --color-on-highlight: #ffffff;
   }
 }

@@ -9,32 +9,32 @@
 {%- endraw %}
 {%- if auth_provider == 'google' %}
 {%- raw %}
-      <VoltButton label="Sign in with Google" class="w-full" @click="signInWithGoogle">
-        <template #icon>
-          <Icon name="simple-icons:google" />
-        </template>
-      </VoltButton>
+      <Button
+        label="Sign in with Google"
+        icon="simple-icons:google"
+        block
+        @click="signInWithGoogle"
+      />
 {%- endraw %}
 {%- elif auth_provider == 'microsoft' %}
 {%- raw %}
-      <VoltButton label="Sign in with Microsoft" class="w-full" @click="signInWithMicrosoft">
-        <template #icon>
-          <Icon name="simple-icons:microsoft" />
-        </template>
-      </VoltButton>
+      <Button
+        label="Sign in with Microsoft"
+        icon="simple-icons:microsoft"
+        block
+        @click="signInWithMicrosoft"
+      />
 {%- endraw %}
 {%- endif %}
 {%- raw %}
-      <VoltSecondaryButton
+      <Button
         v-if="previewMode"
         label="Sign in as preview user"
-        class="w-full"
+        icon="lucide:eye"
+        color="neutral"
+        block
         @click="signInAsPreviewUser"
-      >
-        <template #icon>
-          <Icon name="lucide:eye" />
-        </template>
-      </VoltSecondaryButton>
+      />
     </div>
   </div>
 {%- endraw %}

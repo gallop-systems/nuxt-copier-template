@@ -7,7 +7,7 @@
       </div>
       <div class="flex items-center gap-4">
         <Avatar v-if="user" :alt="name" />
-        <VoltButton v-if="user" label="Log out" severity="secondary" size="small" @click="logout" />
+        <Button v-if="user" label="Log out" color="neutral" size="sm" @click="logout" />
       </div>
     </div>
   </header>

@@ -31,7 +31,7 @@
       "enabled": false
     },
     {
-      "description": "Auto-merge minor/patch updates (prod + dev) once CI passes. CI runs typecheck, the SSR render check, and the test suite, so a broken bump — e.g. a duplicate-transitive-dep type skew that a minor drags in — fails CI and stays open as a red PR for a human; automerge only ever lands green updates. Majors are never matched here, so they always get a manual PR. The kysely and primevue groups below opt back out.",
+      "description": "Auto-merge minor/patch updates (prod + dev) once CI passes. CI runs typecheck, the SSR render check, and the test suite, so a broken bump — e.g. a duplicate-transitive-dep type skew that a minor drags in — fails CI and stays open as a red PR for a human; automerge only ever lands green updates. Majors are never matched here, so they always get a manual PR. The kysely group below opts back out.",
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
     },
@@ -40,18 +40,6 @@
       "matchPackageNames": ["kysely", "kysely-ctl", "kysely-codegen"],
       "groupName": "kysely",
       "automerge": false
-    },
-    {
-      "description": "Bump the PrimeVue / PrimeUIX stack as one PR. These packages share transitive @primevue/core and @primeuix/styles; bumping any subset (e.g. adding @primevue/forms or @primeuix/themes alongside primevue) leaves two versions in the tree that Nitro mis-traces into .output/server, crashing prod SSR at boot or 500ing every route at render. The CI render check is the backstop; grouping removes the duplication at its source. primeicons is excluded — standalone icon font, no shared core. Not auto-merged: the render check catches SSR 5xx but not silent visual/theme regressions, so the UI stack keeps a human in the loop.",
-      "matchPackageNames": ["primevue", "/^@primevue\\//", "/^@primeuix\\//"],
-      "groupName": "primevue",
-      "automerge": false
-    },
-    {
-      "description": "Never offer PrimeVue majors. v5 moved to a commercial license and these apps are migrating off PrimeVue, so the major PR is pure noise — and because it is a grouped PR it is immortal: closing it just makes Renovate recreate it on the next run. Disabling the update type is the only way to keep it closed. Remove this rule if the migration is abandoned.",
-      "matchPackageNames": ["primevue", "/^@primevue\\//", "/^@primeuix\\//"],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
     },
     {
       "description": "Exempt lockfile maintenance from the release-age gate and auto-merge it when green. minimumReleaseAge posts a renovate/stability-days status on the weekly lockfile PR that can never clear — the weekly rebase restarts the two-week clock before it expires — so these PRs sat blocked forever despite green CI. Age is already enforced where it matters: yarn's npmMinimalAgeGate quarantines too-new versions at resolution time, covering lockfile maintenance and every other path into the tree. With the redundant gate dropped, the same automerge contract as minor/patch applies: CI green merges, CI red stays open for a human.",
