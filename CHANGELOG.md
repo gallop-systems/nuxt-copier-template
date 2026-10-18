@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.33.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.32.0...v1.33.0) (2026-10-18)
+
+
+### Features
+
+* **template:** drop PrimeVue and Volt ([#128](https://github.com/gallop-systems/nuxt-copier-template/issues/128)) ([dec5df0](https://github.com/gallop-systems/nuxt-copier-template/commit/dec5df03a19966227ce04eeb8f37a15575df18ea))
+
+
+### Bug Fixes
+
+* **template:** give nuxt-env frontend test setup 30s under pre-push load ([#126](https://github.com/gallop-systems/nuxt-copier-template/issues/126)) ([32b7320](https://github.com/gallop-systems/nuxt-copier-template/commit/32b7320fb85f04319e15a28887d2fad04cd83265))
+
 ## [1.32.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.31.0...v1.32.0) (2026-10-18)
 
 
