@@ -188,7 +188,9 @@ switch (command) {
   case "tokens": {
     const script = join(layer, "scripts", "tokens-check.mjs");
     if (!existsSync(script))
-      fail(`This app's ${PREFIX} (version ${version()}) has no token check. Take a newer one with \`yarn ui:pull\`.`);
+      fail(
+        `This app's ${PREFIX} (version ${version()}) has no token check. Take a newer one with \`yarn ui:pull\`.`,
+      );
     run("node", [script, args[0] ?? "app/assets/css/main.css"]);
     break;
   }

@@ -23,7 +23,9 @@ function databaseName(connectionString: string): string {
 function box(lines: string[]): string {
   const width = Math.max(...lines.map((l) => l.length)) + 2;
   const row = (l: string) => `│ ${l.padEnd(width - 1)}│`;
-  return ["╭" + "─".repeat(width) + "╮", ...lines.map(row), "╰" + "─".repeat(width) + "╯"].join("\n");
+  return ["╭" + "─".repeat(width) + "╮", ...lines.map(row), "╰" + "─".repeat(width) + "╯"].join(
+    "\n",
+  );
 }
 
 export async function setup() {
@@ -95,7 +97,9 @@ export async function setup() {
   }
 
   const applied = results?.filter((r) => r.status === "Success") ?? [];
-  console.log(`Test DB reset: applied ${applied.length} migrations to ${databaseName(testConnectionString)}`);
+  console.log(
+    `Test DB reset: applied ${applied.length} migrations to ${databaseName(testConnectionString)}`,
+  );
 
   await db.destroy();
 }
