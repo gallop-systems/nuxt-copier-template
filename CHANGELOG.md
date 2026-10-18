@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.32.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.31.0...v1.32.0) (2026-10-18)
+
+
+### Features
+
+* **template:** yarn ui:tokens, and the test database's real name in global setup ([#123](https://github.com/gallop-systems/nuxt-copier-template/issues/123)) ([4ce2bde](https://github.com/gallop-systems/nuxt-copier-template/commit/4ce2bde8fb2ae8e00def776a0261ab868e1003f6))
+
 ## [1.31.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.30.0...v1.31.0) (2026-10-18)
 
 
