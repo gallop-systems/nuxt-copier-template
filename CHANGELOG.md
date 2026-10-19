@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.33.1...v2.0.0) (2026-10-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* **template:** the template no longer ships PrimeVue or Volt (dropped in 1.33.0, which should have been a major) and now builds on the gallop-ui layer. Existing apps keep one Toaster and one ConfirmDialog when merging this app.vue.
+
+### Features
+
+* **template:** mount gallop-ui's Toaster and ConfirmDialog once in app.vue ([#133](https://github.com/gallop-systems/nuxt-copier-template/issues/133)) ([9827e55](https://github.com/gallop-systems/nuxt-copier-template/commit/9827e557562c08fe6c8d9b90846d3e45cae309ae))
+* **template:** yarn ui:probe, gallop-ui's hunt for UI bugs screenshots miss ([#132](https://github.com/gallop-systems/nuxt-copier-template/issues/132)) ([f611788](https://github.com/gallop-systems/nuxt-copier-template/commit/f6117883a3802e88394601a6f80a31ec054429a0))
+
 ## [1.33.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.33.0...v1.33.1) (2026-10-19)
 
 
