@@ -99,7 +99,7 @@ hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-200/50 transition-all
 
 <!-- Header icon -->
 <Avatar
-  icon="lucide:users"
+  icon="ph:users"
   alt="Users"
   class="w-11 h-11 rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-950 text-white"
 />
@@ -160,7 +160,7 @@ hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-200/50 transition-all
 
 ```vue
 <button class="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors">
-  <Icon name="lucide:chevron-right" class="text-zinc-600 text-sm" />
+  <Icon name="ph:caret-right" class="text-zinc-600 text-sm" />
 </button>
 ```
 
@@ -191,7 +191,7 @@ hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-200/50 transition-all
   to="/parent"
   class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors"
 >
-  <Icon name="lucide:chevron-left" class="text-zinc-600" />
+  <Icon name="ph:caret-left" class="text-zinc-600" />
 </NuxtLink>
 ```
 
@@ -212,23 +212,27 @@ hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-200/50 transition-all
 
 ## Icons
 
-Use [Lucide](https://lucide.dev/icons/) via `@nuxt/icon`'s `<Icon>` component.
+Use the app's icon set via `@nuxt/icon`'s `<Icon>` component: the set in `gallopUi.iconSet` (`app/app.config.ts`), which
+gallop-ui's own components draw with too. A new app uses [Phosphor](https://phosphoricons.com) (`ph:*`, regular weight); an
+app from before gallop-ui 1.1 may use [Lucide](https://lucide.dev/icons/) (`lucide:*`). Don't mix the two in one app. The
+examples below are Phosphor; `layers/gallop-ui/docs/icons.md` maps common names between the sets.
 Icons are bundled offline (no runtime API calls) — see `nuxt.config.ts`.
 
 ```vue
-<Icon name="lucide:users" />
-<Icon name="lucide:plus" />
-<Icon name="lucide:chevron-left" />
-<Icon name="lucide:chevron-right" />
-<Icon name="lucide:x" />
-<Icon name="lucide:pencil" />
-<Icon name="lucide:trash-2" />
-<Icon name="lucide:search" />
-<Icon name="lucide:loader-circle" class="animate-spin" />  <!-- Loading -->
+<Icon name="ph:users" />
+<Icon name="ph:plus" />
+<Icon name="ph:caret-left" />
+<Icon name="ph:caret-right" />
+<Icon name="ph:x" />
+<Icon name="ph:pencil-simple" />
+<Icon name="ph:trash" />
+<Icon name="ph:magnifying-glass" />
+<Icon name="ph:circle-notch" class="animate-spin" />  <!-- Loading -->
 ```
 
 - Icons render at `1em` and inherit `currentColor`, so size/color them with
-  Tailwind utilities (`text-zinc-500`, `size-4`) like any text.
+  Tailwind utilities (`text-zinc-500`, `text-base`) like any text. Size them with `text-*`: @nuxt/icon
+  sets width and height outside Tailwind's layers, so `size-*` on an `<Icon>` does nothing.
 - **Use static, literal `name` values.** Offline bundling relies on
   `clientBundle.scan` (see `nuxt.config.ts`), which scans the source for
   `<Icon name="...">` with string literals. A computed name
@@ -236,7 +240,7 @@ Icons are bundled offline (no runtime API calls) — see `nuxt.config.ts`.
   silently fall back to a network fetch (and break offline). If you must pick an
   icon dynamically, list every possible value explicitly in
   `icon.clientBundle.icons` in `nuxt.config.ts`.
-- Lucide is monochrome and has **no brand logos**. For brand marks (OAuth
+- Phosphor and Lucide are monochrome and have **no brand logos**. For brand marks (OAuth
   buttons, etc.) use the `simple-icons` set, which also tints with
   `currentColor`: `<Icon name="simple-icons:google" />`.
 - A gallop-ui component that takes an icon (`Button`, `Avatar`) takes any Iconify name in its

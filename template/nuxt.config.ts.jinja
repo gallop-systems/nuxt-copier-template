@@ -7,12 +7,13 @@ export default defineNuxtConfig({
   modules: ["nuxt-auth-utils", "@vueuse/nuxt", "@nuxt/icon"],
   css: ["~/assets/css/main.css"],
   // Icons are fully offline + bundled — no runtime Iconify API calls.
-  // Sets ship in the locally installed @iconify-json/* packages (lucide for
-  // general icons, simple-icons for brand marks). serverBundle covers SSR;
+  // Sets ship in the locally installed @iconify-json/* packages: ph (Phosphor)
+  // for general icons in a new app, lucide for an app whose gallopUi.iconSet is
+  // "lucide" (apps from before gallop-ui 1.1), simple-icons for brand marks. serverBundle covers SSR;
   // clientBundle.scan walks the source for <Icon name="..."> and bundles only
   // the icons actually used into the client.
   icon: {
-    serverBundle: { collections: ["lucide", "simple-icons"] },
+    serverBundle: { collections: ["ph", "lucide", "simple-icons"] },
     clientBundle: { scan: true },
   },
   components: [{ path: "~/components" }],
