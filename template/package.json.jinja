@@ -33,7 +33,8 @@
     "ui:test": "node scripts/gallop-ui.mjs test",
     "ui:tokens": "node scripts/gallop-ui.mjs tokens",
     "ui:migrate": "node scripts/gallop-ui.mjs migrate",
-    "ui:check": "node scripts/gallop-ui.mjs check"
+    "ui:check": "node scripts/gallop-ui.mjs check",
+    "ui:probe": "node scripts/gallop-ui.mjs probe"
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.10.0",
@@ -71,6 +72,7 @@
     {% if include_git_hooks %}"lefthook": "latest",{% endif %}
     "oxlint": "latest",
     "oxfmt": "latest",
+    "playwright-core": "^1.58.0",
     "@vitest/coverage-v8": "^4.0.17",
     "vitest": "^4.0.17",
     "typescript": "^6.0.0",

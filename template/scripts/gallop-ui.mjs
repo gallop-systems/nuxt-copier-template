@@ -15,6 +15,9 @@
 //                             docs/migrating-to-0.18.md
 //   yarn ui:tokens [css]      check a theme CSS file (default app/assets/css/main.css) against the
 //                             layer's token contract: what it is missing, what it still names the old way
+//   yarn ui:probe --url <app> look for UI bugs screenshots miss (fields that differ, clipped rings, menus that
+//                             don't close, colours that flash mid-transition) on a running app; the layer's
+//                             docs/probe.md
 //   yarn ui:version           the version this app has
 //   yarn ui:test              run the layer's own tests
 //   yarn ui:check [--staged]  the guards lefthook runs: no app component named
@@ -194,6 +197,15 @@ switch (command) {
         `This app's ${PREFIX} (version ${version()}) has no token check. Take a newer one with \`yarn ui:pull\`.`,
       );
     run("node", [script, args[0] ?? "app/assets/css/main.css"]);
+    break;
+  }
+  case "probe": {
+    const script = join(layer, "scripts", "probe.mjs");
+    if (!existsSync(script))
+      fail(
+        `This app's ${PREFIX} (version ${version()}) has no ui:probe yet. Take a newer one with \`yarn ui:pull\`.`,
+      );
+    run("node", [script, ...args]);
     break;
   }
   case "version":

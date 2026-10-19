@@ -72,6 +72,11 @@ layer components → build something new (in the layer if another app could use 
 - **Updating:** `yarn ui:pull` (latest release) or `yarn ui:pull vX.Y.Z`. Read the layer's
   CHANGELOG.md first. `yarn ui:version` shows the current one.
 - If `layers/gallop-ui` is missing, add it with `yarn ui:add`.
+- **Checking UI work:** with the app running on throwaway data, `yarn ui:probe --url http://localhost:<port>` loads every
+  page at 1280 and 390, light and dark, presses its tables, menus, tabs, dialogs and forms (it blocks every write), and
+  reports what a screenshot misses: neighbouring fields that differ, clipped focus rings, menus that don't close on a
+  second press, colours that flash mid-transition (`layers/gallop-ui/docs/probe.md`). Sign in with `--login-url` or
+  `--storage-state`.
 
 - **Formatting dates, times, money and numbers:** use the layer's auto-imported `formatDate`, `formatDateTime`,
   `formatRelative`, `formatCurrency`, `formatNumber` and the rest (`layers/gallop-ui/FORMATTERS.md`), not
