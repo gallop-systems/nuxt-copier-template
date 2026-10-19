@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.33.1](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.33.0...v1.33.1) (2026-10-19)
+
+
+### Bug Fixes
+
+* **template:** ignore .agents/skills, and don't suggest stash before a layer pull ([#131](https://github.com/gallop-systems/nuxt-copier-template/issues/131)) ([1d3ee23](https://github.com/gallop-systems/nuxt-copier-template/commit/1d3ee231f4e3e5f1283a926643f6090a64c4c4e1))
+* **template:** ignore auto-animate's post-teardown requestAnimationFrame error in frontend tests ([#129](https://github.com/gallop-systems/nuxt-copier-template/issues/129)) ([4cf721f](https://github.com/gallop-systems/nuxt-copier-template/commit/4cf721f02133deccf7b38f77b261619358f0e62e))
+
 ## [1.33.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.32.0...v1.33.0) (2026-10-18)
 
 
