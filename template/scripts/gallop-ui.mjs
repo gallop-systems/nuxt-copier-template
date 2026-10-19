@@ -12,7 +12,7 @@
 //                             before/after screenshots); the layer's docs/playground.md
 //   yarn ui:migrate [options] after a breaking ui:pull: rewrite app/ for it and write a
 //                             checklist (--dry shows the diff first); the layer's
-//                             docs/migrating-to-0.18.md
+//                             docs/upgrading.md
 //   yarn ui:tokens [css]      check a theme CSS file (default app/assets/css/main.css) against the
 //                             layer's token contract: what it is missing, what it still names the old way
 //   yarn ui:probe --url <app> look for UI bugs screenshots miss (fields that differ, clipped rings, menus that
