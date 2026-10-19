@@ -13,6 +13,19 @@ export default isFrontendTest
         // (typecheck + backend tests) that setup can pass vitest's 10s hook
         // default and fail whole files with no test-level error.
         hookTimeout: 30_000,
+        // @formkit/auto-animate schedules `requestAnimationFrame` from a timer.
+        // When that timer fires after a file's environment is torn down, the
+        // global is gone and vitest reports an unhandled error that fails the
+        // run with every test passing. Ignore exactly that one; anything else
+        // still fails.
+        onUnhandledError(error) {
+          const text = `${error?.message ?? ""}\n${error?.stack ?? ""}`;
+          if (
+            text.includes("requestAnimationFrame is not defined") &&
+            text.includes("auto-animate")
+          )
+            return false;
+        },
         include: [
           "app/components/**/*.test.ts",
           "app/pages/**/*.test.ts",
