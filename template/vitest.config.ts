@@ -20,7 +20,11 @@ export default isFrontendTest
         // still fails.
         onUnhandledError(error) {
           const text = `${error?.message ?? ""}\n${error?.stack ?? ""}`;
-          if (text.includes("requestAnimationFrame is not defined") && text.includes("auto-animate")) return false;
+          if (
+            text.includes("requestAnimationFrame is not defined") &&
+            text.includes("auto-animate")
+          )
+            return false;
         },
         include: [
           "app/components/**/*.test.ts",
