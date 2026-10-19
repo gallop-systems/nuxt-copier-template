@@ -212,7 +212,7 @@ hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-200/50 transition-all
 
 ## Icons
 
-Use the app's icon set via `@nuxt/icon`'s `<Icon>` component: the set in `gallopUi.iconSet` (`app/app.config.ts`), which
+Use the app's icon set via `@nuxt/icon`'s `<Icon>` component: the set in `gallopUi.icons` (`app/app.config.ts`), which
 gallop-ui's own components draw with too. A new app uses [Phosphor](https://phosphoricons.com) (`ph:*`, regular weight); an
 app from before gallop-ui 1.1 may use [Lucide](https://lucide.dev/icons/) (`lucide:*`). Don't mix the two in one app. The
 examples below are Phosphor; `layers/gallop-ui/docs/icons.md` maps common names between the sets.
