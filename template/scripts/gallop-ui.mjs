@@ -68,7 +68,9 @@ function version() {
 
 function requireClean() {
   if (git("status", "--porcelain"))
-    fail("Commit or stash your changes first: git subtree needs a clean tree.");
+    fail(
+      "Commit your changes first (or move them to a branch or worktree): git subtree needs a clean tree.",
+    );
 }
 
 /** Nuxt's component name for a file under a components dir (pathPrefix on). */

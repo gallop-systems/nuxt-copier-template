@@ -39,5 +39,6 @@ coverage
 
 # Claude Code skills — symlinked from @gallopsystems/agent-skills on install
 .claude/skills
+.agents/skills
 .claude/commands
 
