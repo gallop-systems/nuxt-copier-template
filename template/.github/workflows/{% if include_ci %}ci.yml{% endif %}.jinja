@@ -78,6 +78,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Need history so the migration guard can diff against the base branch
+          # and see which migrations this PR actually adds.
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -91,6 +95,10 @@ jobs:
           key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
           restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
       - run: yarn install --immutable
+      # Cheap and dependency-free, so it runs before anything slow: a bad
+      # migration filename is unrecoverable once it reaches a live database.
+      - name: Check migration filenames
+        run: node scripts/check-migration-filenames.mjs --base origin/{% raw %}${{ github.base_ref || 'main' }}{% endraw %}
       # oxlint + oxfmt are Rust-fast (sub-second) and run first so a lint/format
       # failure surfaces before the slower typecheck.
       - run: yarn lint
