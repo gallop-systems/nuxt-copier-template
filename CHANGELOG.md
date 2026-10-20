@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.1.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v2.0.0...v2.1.0) (2026-10-20)
+
+
+### Features
+
+* **template:** new apps draw Phosphor icons (gallopUi.iconSet) ([2f17e37](https://github.com/gallop-systems/nuxt-copier-template/commit/2f17e37a548073ad6fabbfe868230c9a4d0c2115))
+* **template:** new apps draw Phosphor icons (gallopUi.iconSet) ([68372e1](https://github.com/gallop-systems/nuxt-copier-template/commit/68372e1c8bd26c0a53d2ee52b878b7caefa2be38))
+
+
+### Bug Fixes
+
+* **template:** the setting is gallopUi.icons ([28135dc](https://github.com/gallop-systems/nuxt-copier-template/commit/28135dcfff7e7ce88c6ced98a1b1b3d238ac4c72))
+
+
+### Documentation
+
+* **template:** point ui:migrate at the layer's upgrading guide ([#135](https://github.com/gallop-systems/nuxt-copier-template/issues/135)) ([82e5578](https://github.com/gallop-systems/nuxt-copier-template/commit/82e5578738430e5f532eb3bcdec144924bde8ac4))
+
 ## [2.0.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v1.33.1...v2.0.0) (2026-10-19)
 
 
