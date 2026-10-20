@@ -5,5 +5,8 @@ export default defineAppConfig({
     // The zone times are shown in: formatDateTime, formatTime, formatRelative and DateText.
     // Server and browser read the same value, so they print the same text.
     timeZone: "{{ time_zone }}",
+    // The icons the layer's components draw (chevrons, close, check...): "phosphor" or "lucide". Use the same set
+    // for the app's own icons (`ph:*` here).
+    icons: "phosphor",
   },
 });
