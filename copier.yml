@@ -5,6 +5,12 @@ _skip_if_exists:
   # An app owns its app.config.ts (gallopUi.pt, its looks). The template writes
   # it only into a new app; `copier update` never touches an existing one.
   - "app/app.config.ts"
+  # The same for the two files every app edits first: its token block and colours
+  # (main.css) and its header. They keep conflicting in `copier update`, so they are
+  # written into a new app and left alone afterwards. A template change to either is
+  # announced in the release notes to copy by hand.
+  - "app/assets/css/main.css"
+  - "app/components/AppHeader.vue"
 # Copier's defaults come first: setting _exclude replaces them.
 _exclude:
   - "copier.yaml"
