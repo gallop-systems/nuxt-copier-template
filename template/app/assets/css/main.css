@@ -4,97 +4,201 @@
    (layers/gallop-ui, see its README) */
 @source "../../../layers/gallop-ui/components";
 
-/* Semantic surface tokens (zinc-first). Write `bg-surface`, `text-fg`,
-   `border-line` ONCE — they flip automatically under prefers-color-scheme
-   (see the dark override below). This is what makes dark mode un-forgettable:
-   there is no `dark:` half to omit.
+/* Semantic tokens (zinc-first). Write `bg-surface`, `text-fg`, `border-line`
+   ONCE — they flip between light and dark by themselves. This is what makes dark
+   mode un-forgettable: there is no `dark:` half to omit.
 
    Use these for YOUR app markup (pages, components); gallop-ui's components read
-   the same tokens (layers/gallop-ui/TOKENS.md is the contract).
-   Light values here; dark values in the @media block near the bottom. */
+   the same tokens. The contract is layers/gallop-ui/TOKENS.md, and these values
+   are the layer's theme/neutral.css. `yarn ui:tokens` lists any contract token
+   this file is missing (run it after every `yarn ui:pull`).
+
+   Every colour is ONE declaration, `light-dark(<light>, <dark>)` (a value that
+   is the same in both modes is written once). Which half shows is the
+   `color-scheme` of the element, set in the "Dark mode" block at the end. */
 @theme {
   /* The app's UI font is --font-sans, set here and nowhere else (not in a layout): e.g.
      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif; Tailwind's system stack until then. */
-  --color-canvas: #fafafa; /* zinc-50  — app background */
-  --color-surface: #ffffff; /* white    — cards, panels, dialogs */
-  --color-surface-muted: #fafafa; /* zinc-50  — subtle fills, row hover */
-  --color-line: #e4e4e7; /* zinc-200 — borders */
-  --color-line-soft: #f4f4f5; /* zinc-100 — soft dividers */
-  --color-fg: #18181b; /* zinc-900 — primary text */
-  --color-fg-muted: #71717a; /* zinc-500 — secondary text */
-  --color-fg-subtle: #a1a1aa; /* zinc-400 — tertiary text */
-  --color-fill: #e4e4e7; /* zinc-200 — neutral solid fills: avatars, tracks, dots, skeletons */
 
-  /* Fills and their states (gallop-ui's Button and other controls). The dark block below
-     flips them. */
-  --color-accent: #09090b; /* zinc-950 — primary fills (buttons) */
-  --color-accent-hover: #27272a; /* zinc-800 */
-  --color-accent-active: #3f3f46; /* zinc-700 */
-  --color-on-accent: #ffffff; /* text/icon on an accent fill */
-  --color-fill-subtle: #f4f4f5; /* zinc-100 — secondary button */
-  --color-fill-strong: #d4d4d8; /* zinc-300 — secondary button, pressed */
-  --color-on-fill: #52525b; /* zinc-600 */
-  --color-on-fill-hover: #3f3f46; /* zinc-700 */
-  --color-on-fill-active: #27272a; /* zinc-800 */
-  --color-surface-active: #f4f4f5; /* zinc-100 — quiet button, pressed */
-  --color-fg-quiet: #71717a; /* zinc-500 — quiet button label; a field's placeholder */
+  /* Type steps between Tailwind's: 11px and 13px, the sizes dense UI (tables, sidebars, badges) lives in. */
+  --text-2xs: 0.6875rem;
+  --text-compact: 0.8125rem;
 
-  /* Form controls (gallop-ui's Input, Textarea and Select). */
-  --color-field: #ffffff; /* a field's fill */
-  --color-on-field: #3f3f46; /* zinc-700 — text in a field */
-  --color-line-strong: #d4d4d8; /* zinc-300 — a field's border */
-  --color-line-strong-hover: #a1a1aa; /* zinc-400 — a field's border, hovered */
+  /* Surfaces */
+  --color-canvas: light-dark(#fafafa, #09090b); /* zinc-50 / zinc-950 — app background */
+  --color-surface: light-dark(#ffffff, #18181b); /* white / zinc-900 — cards, panels, dialogs */
+  --color-surface-muted: light-dark(#fafafa, #27272a); /* subtle fills, row hover */
+  --color-surface-active: light-dark(#f4f4f5, #3f3f46); /* quiet button, pressed */
+  --color-scrim: rgb(0 0 0 / 0.5); /* behind a modal or drawer; the same in both modes */
 
-  /* Panels (gallop-ui's Modal, Card and popups). */
-  --color-line-panel: #e4e4e7; /* zinc-200 — a panel's outline */
-  --color-on-surface: #3f3f46; /* zinc-700 — running text on a surface */
+  /* Neutral fills (avatars, tracks, secondary buttons), and the text on them */
+  --color-fill-subtle: light-dark(#f4f4f5, #27272a);
+  --color-fill: light-dark(#e4e4e7, #3f3f46);
+  --color-fill-strong: light-dark(#d4d4d8, #52525b);
+  --color-on-fill: light-dark(#52525b, #d4d4d8);
+  --color-on-fill-hover: light-dark(#3f3f46, #e4e4e7);
+  --color-on-fill-active: light-dark(#27272a, #f4f4f5);
 
-  /* The chosen item in a list (gallop-ui's Select). */
-  --color-highlight: #09090b;
-  --color-highlight-emphasis: #3f3f46; /* ...while hovered or focused */
-  --color-on-highlight: #ffffff;
+  /* Lines */
+  --color-line-subtle: light-dark(#f4f4f5, #27272a); /* soft dividers */
+  --color-line: light-dark(#e4e4e7, #27272a); /* borders */
+  --color-line-panel: light-dark(#e4e4e7, #3f3f46); /* a panel's outline (Modal, Card, popups) */
+  --color-line-strong: light-dark(#d4d4d8, #3f3f46); /* a field's border */
+  --color-line-strong-hover: light-dark(#a1a1aa, #52525b); /* a field's border, hovered */
+
+  /* Form controls and running text. fg-muted / fg-subtle are lifted off a strict
+     mirror-invert in dark for legibility on near-black. */
+  --color-field: light-dark(#ffffff, #09090b); /* a field's fill */
+  --color-on-surface: light-dark(#3f3f46, #ffffff); /* running text on a surface, text in a field */
+  --color-fg: light-dark(#18181b, #f4f4f5); /* primary text */
+  --color-fg-muted: light-dark(#71717a, #b4b4bc); /* secondary text */
+  --color-fg-subtle: light-dark(#a1a1aa, #8c8c95); /* tertiary text, placeholders */
+
+  /* Accent: primary fills (buttons), and the focus ring. Inverts to light in dark. */
+  --color-accent: light-dark(#09090b, #ffffff);
+  --color-accent-hover: light-dark(#27272a, #f4f4f5);
+  --color-accent-active: light-dark(#3f3f46, #e4e4e7);
+  --color-on-accent: light-dark(#ffffff, #09090b);
+
+  /* Highlight: any chosen item (a selected option, row, nav item) */
+  --color-highlight: light-dark(#e4e4e7, color-mix(in srgb, #ffffff 16%, transparent));
+  --color-highlight-hover: light-dark(#d4d4d8, color-mix(in srgb, #ffffff 24%, transparent));
+  --color-on-highlight: light-dark(#18181b, #f4f4f5);
 
   /* The knob of a control you slide or drag (gallop-ui's Switch thumb). */
-  --color-handle: #ffffff;
+  --color-handle: light-dark(#ffffff, #a1a1aa);
+
+  /* Status families: danger (red), warning (amber), success (emerald), info (blue). Per family:
+     <s> text and icons in the hue, -soft a tinted fill, -soft-hover that fill hovered, -line its border,
+     -mark a mid-tone mark (a dot, an invalid border), -solid a strong fill, -solid-hover that fill hovered,
+     and on-<s> the text on -solid. */
+
+  /* danger: red */
+  --color-danger: light-dark(
+    oklch(50.5% 0.213 27.518),
+    oklch(80.8% 0.114 19.571)
+  ); /* red-700 / red-300 */
+  --color-danger-soft: light-dark(
+    oklch(97.1% 0.013 17.38),
+    oklch(63.7% 0.237 25.331 / 15%)
+  ); /* red-50 / red-500 at 15% */
+  --color-danger-soft-hover: light-dark(
+    oklch(93.6% 0.032 17.717),
+    oklch(63.7% 0.237 25.331 / 25%)
+  ); /* red-100 / red-500 at 25% */
+  --color-danger-line: light-dark(
+    oklch(88.5% 0.062 18.334),
+    oklch(50.5% 0.213 27.518 / 35%)
+  ); /* red-200 / red-700 at 35% */
+  --color-danger-mark: light-dark(
+    oklch(63.7% 0.237 25.331),
+    oklch(70.4% 0.191 22.216)
+  ); /* red-500 / red-400 */
+  --color-danger-solid: oklch(57.7% 0.245 27.325); /* red-600 */
+  --color-danger-solid-hover: oklch(50.5% 0.213 27.518); /* red-700 */
+  --color-on-danger: #ffffff; /* white */
+
+  /* warning: amber */
+  --color-warning: light-dark(
+    oklch(55.5% 0.163 48.998),
+    oklch(87.9% 0.169 91.605)
+  ); /* amber-700 / amber-300 */
+  --color-warning-soft: light-dark(
+    oklch(98.7% 0.022 95.277),
+    oklch(76.9% 0.188 70.08 / 15%)
+  ); /* amber-50 / amber-500 at 15% */
+  --color-warning-soft-hover: light-dark(
+    oklch(96.2% 0.059 95.617),
+    oklch(76.9% 0.188 70.08 / 25%)
+  ); /* amber-100 / amber-500 at 25% */
+  --color-warning-line: light-dark(
+    oklch(92.4% 0.12 95.746),
+    oklch(55.5% 0.163 48.998 / 35%)
+  ); /* amber-200 / amber-700 at 35% */
+  --color-warning-mark: light-dark(
+    oklch(76.9% 0.188 70.08),
+    oklch(82.8% 0.189 84.429)
+  ); /* amber-500 / amber-400 */
+  --color-warning-solid: oklch(55.5% 0.163 48.998); /* amber-700 */
+  --color-warning-solid-hover: oklch(47.3% 0.137 46.201); /* amber-800 */
+  --color-on-warning: #ffffff; /* white */
+
+  /* success: emerald */
+  --color-success: light-dark(
+    oklch(50.8% 0.118 165.612),
+    oklch(84.5% 0.143 164.978)
+  ); /* emerald-700 / emerald-300 */
+  --color-success-soft: light-dark(
+    oklch(97.9% 0.021 166.113),
+    oklch(69.6% 0.17 162.48 / 15%)
+  ); /* emerald-50 / emerald-500 at 15% */
+  --color-success-soft-hover: light-dark(
+    oklch(95% 0.052 163.051),
+    oklch(69.6% 0.17 162.48 / 25%)
+  ); /* emerald-100 / emerald-500 at 25% */
+  --color-success-line: light-dark(
+    oklch(90.5% 0.093 164.15),
+    oklch(50.8% 0.118 165.612 / 35%)
+  ); /* emerald-200 / emerald-700 at 35% */
+  --color-success-mark: light-dark(
+    oklch(69.6% 0.17 162.48),
+    oklch(76.5% 0.177 163.223)
+  ); /* emerald-500 / emerald-400 */
+  --color-success-solid: oklch(50.8% 0.118 165.612); /* emerald-700 */
+  --color-success-solid-hover: oklch(43.2% 0.095 166.913); /* emerald-800 */
+  --color-on-success: #ffffff; /* white */
+
+  /* info: blue */
+  --color-info: light-dark(
+    oklch(48.8% 0.243 264.376),
+    oklch(80.9% 0.105 251.813)
+  ); /* blue-700 / blue-300 */
+  --color-info-soft: light-dark(
+    oklch(97% 0.014 254.604),
+    oklch(62.3% 0.214 259.815 / 15%)
+  ); /* blue-50 / blue-500 at 15% */
+  --color-info-soft-hover: light-dark(
+    oklch(93.2% 0.032 255.585),
+    oklch(62.3% 0.214 259.815 / 25%)
+  ); /* blue-100 / blue-500 at 25% */
+  --color-info-line: light-dark(
+    oklch(88.2% 0.059 254.128),
+    oklch(48.8% 0.243 264.376 / 35%)
+  ); /* blue-200 / blue-700 at 35% */
+  --color-info-mark: light-dark(
+    oklch(62.3% 0.214 259.815),
+    oklch(70.7% 0.165 254.624)
+  ); /* blue-500 / blue-400 */
+  --color-info-solid: oklch(54.6% 0.245 262.881); /* blue-600 */
+  --color-info-solid-hover: oklch(48.8% 0.243 264.376); /* blue-700 */
+  --color-on-info: #ffffff; /* white */
 }
 
-/* Dark mode (follows the OS via prefers-color-scheme, matching Tailwind v4's
-   default `dark:` variant). The accent inverts to light shades so filled
-   buttons/highlights read on dark surfaces. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Semantic surface tokens — dark values (override the light defaults above).
-       fg-muted / fg-subtle are lifted off a strict mirror-invert for legibility
-       on near-black. */
-    --color-canvas: #09090b; /* zinc-950 */
-    --color-surface: #18181b; /* zinc-900 */
-    --color-surface-muted: #27272a; /* zinc-800 */
-    --color-line: #27272a; /* zinc-800 */
-    --color-line-soft: #27272a; /* zinc-800 */
-    --color-fg: #f4f4f5; /* zinc-100 */
-    --color-fg-muted: #b4b4bc; /* secondary — ~9:1 on near-black */
-    --color-fg-subtle: #8c8c95; /* tertiary  — ~5.5:1 on near-black */
-    --color-fill: #3f3f46; /* zinc-700 — reads as a raised surface on dark */
-    --color-fill-subtle: #27272a;
-    --color-fill-strong: #52525b;
-    --color-on-fill: #d4d4d8;
-    --color-on-fill-hover: #e4e4e7;
-    --color-on-fill-active: #f4f4f5;
-    --color-surface-active: #3f3f46;
-    --color-fg-quiet: #a1a1aa;
-    --color-field: #09090b;
-    --color-on-field: #ffffff;
-    --color-line-strong: #3f3f46;
-    --color-line-strong-hover: #52525b;
-    --color-line-panel: #3f3f46;
-    --color-on-surface: #ffffff;
-    --color-handle: #a1a1aa;
-    --color-accent: #ffffff;
-    --color-accent-hover: #f4f4f5;
-    --color-accent-active: #e4e4e7;
-    --color-on-accent: #09090b;
-    --color-highlight: color-mix(in srgb, #ffffff 16%, transparent);
-    --color-highlight-emphasis: color-mix(in srgb, #ffffff 24%, transparent);
-    --color-on-highlight: #ffffff;
+/* Dark mode: the OS decides, and the person's Light / Dark / System pick
+   overrides it (gallop-ui's useColorScheme(), e.g. `show-color-scheme` on a
+   Sidebar or TopBar, writes `data-color-scheme="light|dark"` on <html>, or an
+   empty attribute for System). Every token above follows it through
+   `color-scheme`. See layers/gallop-ui/docs/color-scheme.md. */
+:root {
+  color-scheme: light dark;
+}
+:root[data-color-scheme="light"] {
+  color-scheme: light;
+}
+:root[data-color-scheme="dark"] {
+  color-scheme: dark;
+}
+
+/* Tailwind's `dark:` variant answers the same switch, so a `dark:` class in app
+   markup agrees with the tokens: the OS unless the person pinned Light, or a
+   pinned Dark. Prefer tokens over `dark:` pairs anyway. */
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-color-scheme="light"]), :root:not([data-color-scheme="light"]) *) {
+      @slot;
+    }
+  }
+  &:where(:root[data-color-scheme="dark"], :root[data-color-scheme="dark"] *) {
+    @slot;
   }
 }
