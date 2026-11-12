@@ -64,11 +64,12 @@ layer components → build something new (in the layer if another app could use 
   elements.
 - **Never shadow:** no `app/components` file may register under a layer component's name.
   Adopting a layer component means deleting the app's own copy in the same change.
-- **Changing the layer:** edit files in `layers/gallop-ui` in a commit of their own, with no app files
-  and a client-neutral message (the layer goes to every client). Check the look at `/_ui` in `yarn dev`
-  (every component's stories in this app's theme, development only), then run `yarn ui:impact`: it shows what
-  the change does to every app on this machine (call sites, type errors, before/after screenshots). Send it back
-  with `yarn ui:push <branch>` and open a PR in gallop-systems/gallop-ui.
+- **Never edit `layers/gallop-ui` (strict).** The layer in this app is exactly a gallop-ui release and is
+  read-only here. Need a change in its internals? Do it upstream: a PR in gallop-systems/gallop-ui (client-neutral,
+  it goes to every client; `yarn ui:impact` there shows what it does to every app), a release, then `yarn ui:pull`.
+  Or do it in userland, in this app's own code: `pt`/`defaults` in app.config, a wrapper component, a slot. Never
+  both at once, never "just for now". `yarn ui:check` enforces it: lefthook refuses a commit that touches the
+  layer outside a `ui:pull` merge, and CI fails if the layer differs from the release it was pulled at.
 - **Updating:** `yarn ui:pull` (latest release) or `yarn ui:pull vX.Y.Z`. Read the layer's
   CHANGELOG.md first. `yarn ui:version` shows the current one.
 - If `layers/gallop-ui` is missing, add it with `yarn ui:add`.

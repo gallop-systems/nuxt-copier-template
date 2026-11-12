@@ -5,11 +5,9 @@
 //
 //   yarn ui:add [vX.Y.Z]      add the layer (default: the latest release)
 //   yarn ui:pull [vX.Y.Z]     take a newer release (default: the latest)
-//   yarn ui:push <branch>     send commits made to layers/gallop-ui back, as a
-//                             branch of gallop-ui to open a PR from
-//   yarn ui:impact [options]  before ui:push: what an edit to layers/gallop-ui does to
-//                             every app on this machine (call sites, types,
-//                             before/after screenshots); the layer's docs/playground.md
+//   yarn ui:impact [options]  what a change to gallop-ui would do to every app on this
+//                             machine (call sites, types, before/after screenshots);
+//                             the layer's docs/playground.md
 //   yarn ui:migrate [options] after a breaking ui:pull: rewrite app/ for it and write a
 //                             checklist (--dry shows the diff first); the layer's
 //                             docs/upgrading.md
@@ -20,9 +18,14 @@
 //                             docs/probe.md
 //   yarn ui:version           the version this app has
 //   yarn ui:test              run the layer's own tests
-//   yarn ui:check [--staged]  the guards lefthook runs: no app component named
-//                             like a layer component; with --staged, no commit
-//                             mixing layer and app files
+//   yarn ui:check [--staged]  the guards lefthook and CI run: layers/gallop-ui is exactly
+//                             the release it was pulled at, and no app component is named
+//                             like a layer component; with --staged, no commit changes the
+//                             layer outside a ui:pull merge
+//
+// layers/gallop-ui is read-only in an app. It is a gallop-ui release, nothing else: a
+// change to the layer is made in the gallop-ui repo and arrives with `yarn ui:pull`, or is
+// made in this app's own code (pt and app.config, a wrapper component, a slot).
 //
 // GALLOP_UI_REMOTE overrides the remote (e.g. an https URL with a token in CI).
 import { execFileSync, spawnSync } from "node:child_process";
@@ -106,10 +109,31 @@ function check(staged) {
   if (staged) {
     const files = git("diff", "--cached", "--name-only").split("\n").filter(Boolean);
     const inLayer = files.filter((f) => f.startsWith(`${PREFIX}/`));
-    if (inLayer.length && inLayer.length !== files.length) {
+    // `yarn ui:pull` is a merge, and so is resolving its conflicts: those are the only commits that may touch the layer.
+    const merging = spawnSync("git", ["rev-parse", "-q", "--verify", "MERGE_HEAD"]).status === 0;
+    if (inLayer.length && !merging) {
       problems.push(
-        `This commit mixes ${PREFIX} with app files. Commit the layer change on its own ` +
-          `(it goes back to gallop-ui with \`yarn ui:push\`), then the app change.`,
+        `This commit changes ${PREFIX} (${inLayer.slice(0, 3).join(", ")}${inLayer.length > 3 ? ", …" : ""}). ` +
+          `The layer is a gallop-ui release and is read-only here: make the change in the gallop-ui repo and take it ` +
+          `with \`yarn ui:pull\`, or make it in this app's own code (pt in app.config, a wrapper, a slot). ` +
+          `Undo it with \`git restore --staged --worktree ${PREFIX}\`.`,
+      );
+    }
+  } else if (existsSync(layer)) {
+    // The layer must be byte for byte the release last pulled: the tree of the newest `git subtree` squash commit.
+    const squash = git("log", "--grep", `^git-subtree-dir: ${PREFIX}$`, "-1", "--format=%H");
+    if (!squash) {
+      console.warn(
+        `gallop-ui check: no \`git subtree\` squash commit in the history (a shallow clone?), so ${PREFIX} ` +
+          `couldn't be compared with its release. Fetch the full history (fetch-depth: 0 in CI) to check it.`,
+      );
+    } else if (git("rev-parse", `${squash}^{tree}`) !== git("rev-parse", `HEAD:${PREFIX}`)) {
+      const changed = git("diff", "--name-only", squash, `HEAD:${PREFIX}`).split("\n").filter(Boolean);
+      problems.push(
+        `${PREFIX} differs from the gallop-ui release it was pulled at (${changed.length} file(s): ` +
+          `${changed.slice(0, 5).join(", ")}${changed.length > 5 ? ", …" : ""}). The layer is read-only in an app: ` +
+          `move the change into the gallop-ui repo (then \`yarn ui:pull\`) or into this app's own code, and put ` +
+          `the layer back to its release.`,
       );
     }
   }
@@ -174,13 +198,12 @@ switch (command) {
     ]);
     break;
   }
-  case "push": {
-    const branch = args[0];
-    if (!branch) fail("Usage: yarn ui:push <branch-name-for-gallop-ui>");
-    run("git", ["subtree", "push", `--prefix=${PREFIX}`, REMOTE, branch]);
-    console.log(`\nPushed. Open a PR in gallop-systems/gallop-ui from ${branch}.`);
+  case "push":
+    fail(
+      `ui:push is gone: ${PREFIX} is read-only in an app. Make the change in the gallop-ui repo ` +
+        `(github.com/gallop-systems/gallop-ui), release it, and take it here with \`yarn ui:pull\`.`,
+    );
     break;
-  }
   case "impact": {
     const script = join(layer, "scripts", "impact.mjs");
     if (!existsSync(script))
