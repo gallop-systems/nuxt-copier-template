@@ -1,8 +1,7 @@
 pre-commit:
   commands:
-    # layers/gallop-ui is read-only: only a `yarn ui:pull` merge may change it
-    # (a layer change is made in the gallop-ui repo), and no app component may
-    # shadow a layer component.
+    # layers/gallop-ui changes go in commits of their own (they're pushed back
+    # to gallop-ui), and no app component may shadow a layer component.
     gallop-ui:
       run: yarn ui:check --staged
     fmt:
@@ -29,6 +28,12 @@ pre-push:
         - rebase
     typecheck:
       run: yarn typecheck
+      skip:
+        - merge
+        - rebase
+    # Edits to layers/gallop-ui must be sent back (yarn ui:push) before the app is pushed.
+    gallop-ui-pushed:
+      run: yarn ui:check --pushed
       skip:
         - merge
         - rebase

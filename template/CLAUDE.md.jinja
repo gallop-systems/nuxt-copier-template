@@ -64,12 +64,13 @@ layer components → build something new (in the layer if another app could use 
   elements.
 - **Never shadow:** no `app/components` file may register under a layer component's name.
   Adopting a layer component means deleting the app's own copy in the same change.
-- **Never edit `layers/gallop-ui` (strict).** The layer in this app is exactly a gallop-ui release and is
-  read-only here. Need a change in its internals? Do it upstream: a PR in gallop-systems/gallop-ui (client-neutral,
-  it goes to every client; `yarn ui:impact` there shows what it does to every app), a release, then `yarn ui:pull`.
-  Or do it in userland, in this app's own code: `pt`/`defaults` in app.config, a wrapper component, a slot. Never
-  both at once, never "just for now". `yarn ui:check` enforces it: lefthook refuses a commit that touches the
-  layer outside a `ui:pull` merge, and CI fails if the layer differs from the release it was pulled at.
+- **Changing the layer: every edit goes back (strict).** An edit to `layers/gallop-ui` is fine only on its way
+  upstream. Commit it on its own (no app files, a client-neutral message: the layer goes to every client), check the
+  look at `/_ui` in `yarn dev` and run `yarn ui:impact`, then **`yarn ui:push <branch>` and open the PR in
+  gallop-systems/gallop-ui right away**, before or with the app's own PR. Link the two PRs. An edit that is never
+  pushed drifts the app from its release and is fought over on every `ui:pull`. Lefthook's pre-push
+  (`yarn ui:check --pushed`) refuses to push the app while a layer edit isn't on a gallop-ui branch, and CI warns.
+  An app-only need doesn't go in the layer at all: use `pt`/`defaults` in app.config, a wrapper component or a slot.
 - **Updating:** `yarn ui:pull` (latest release) or `yarn ui:pull vX.Y.Z`. Read the layer's
   CHANGELOG.md first. `yarn ui:version` shows the current one.
 - If `layers/gallop-ui` is missing, add it with `yarn ui:add`.
