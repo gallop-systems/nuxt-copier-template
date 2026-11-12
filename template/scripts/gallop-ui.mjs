@@ -128,7 +128,9 @@ function check(staged) {
           `couldn't be compared with its release. Fetch the full history (fetch-depth: 0 in CI) to check it.`,
       );
     } else if (git("rev-parse", `${squash}^{tree}`) !== git("rev-parse", `HEAD:${PREFIX}`)) {
-      const changed = git("diff", "--name-only", squash, `HEAD:${PREFIX}`).split("\n").filter(Boolean);
+      const changed = git("diff", "--name-only", squash, `HEAD:${PREFIX}`)
+        .split("\n")
+        .filter(Boolean);
       problems.push(
         `${PREFIX} differs from the gallop-ui release it was pulled at (${changed.length} file(s): ` +
           `${changed.slice(0, 5).join(", ")}${changed.length > 5 ? ", …" : ""}). The layer is read-only in an app: ` +
