@@ -78,6 +78,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # ui:check compares layers/gallop-ui with the release it was pulled at (a warning when it differs), which needs the history.
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -103,7 +106,8 @@ jobs:
       - run: yarn test:frontend:run
         env:
           NODE_OPTIONS: --experimental-strip-types
-      # The shared UI layer's own tests, against this app's dependencies.
+      # Nothing shadows a layer component, and a warning for layer edits not yet released; then the layer's
+      # own tests, against this app's dependencies.
       - run: yarn ui:check && yarn ui:test
 
   build:

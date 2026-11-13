@@ -20,9 +20,17 @@
 //                             docs/probe.md
 //   yarn ui:version           the version this app has
 //   yarn ui:test              run the layer's own tests
-//   yarn ui:check [--staged]  the guards lefthook runs: no app component named
-//                             like a layer component; with --staged, no commit
-//                             mixing layer and app files
+//   yarn ui:check [--staged|--pushed]
+//                             the guards lefthook and CI run: no app component named like a
+//                             layer component; with --staged (pre-commit), no commit mixing
+//                             layer and app files; with --pushed (pre-push), every edit to
+//                             layers/gallop-ui is on a gallop-ui branch (sent with ui:push);
+//                             plain (CI), a warning listing layer edits not yet in a release
+//
+// An edit to layers/gallop-ui is fine, as long as it goes back: commit it on its own, then
+// `yarn ui:push <branch>` and open the PR in gallop-ui before (or with) the app's PR. An
+// edit that is never pushed is lost on the next ui:pull and drifts the app from its release,
+// so lefthook's pre-push refuses to push the app while one is outstanding.
 //
 // GALLOP_UI_REMOTE overrides the remote (e.g. an https URL with a token in CI).
 import { execFileSync, spawnSync } from "node:child_process";
@@ -100,16 +108,114 @@ function vueFiles(dir) {
     .map((e) => relative(dir, join(e.parentPath, e.name)));
 }
 
-function check(staged) {
+/** The newest `git subtree` squash commit: its tree is exactly the release last pulled. */
+function releaseCommit() {
+  return git("log", "--grep", `^git-subtree-dir: ${PREFIX}$`, "-1", "--format=%H");
+}
+
+const layerInHead = () =>
+  spawnSync("git", ["rev-parse", "-q", "--verify", `HEAD:${PREFIX}`]).status === 0;
+
+/** Files where layers/gallop-ui differs from the release last pulled, or null if that can't be told. */
+function layerEdits() {
+  const squash = releaseCommit();
+  if (!squash) return null;
+  // Not committed yet (a fresh ui:add, or a layer put back and not yet committed): nothing to compare.
+  if (!layerInHead()) return [];
+  if (git("rev-parse", `${squash}^{tree}`) === git("rev-parse", `HEAD:${PREFIX}`)) return [];
+  return git("diff", "--name-only", squash, `HEAD:${PREFIX}`).split("\n").filter(Boolean);
+}
+
+const list = (files) => `${files.slice(0, 5).join(", ")}${files.length > 5 ? ", …" : ""}`;
+
+/**
+ * The edited layer files that no gallop-ui branch has as they are here, or null if gallop-ui can't be reached.
+ * `ui:push` puts every edited file on a branch byte for byte; a file counts as sent back when any branch tip
+ * holds the same content at the same path (or, for a deleted file, lacks it). Checking file by file, not the
+ * whole tree, keeps an edit counted as pushed after a later `ui:pull` merges a release around it.
+ */
+function unpushed(edits) {
+  // The branch tips' commits and trees, no file contents: enough to compare blob ids, cheap to fetch.
+  const r = spawnSync(
+    "git",
+    [
+      "fetch",
+      "-q",
+      "--no-tags",
+      "--depth=1",
+      "--filter=blob:none",
+      REMOTE,
+      "+refs/heads/*:refs/gallop-ui-check/*",
+    ],
+    { stdio: ["ignore", "ignore", "inherit"] },
+  );
+  if (r.status !== 0) return null;
+  const tips = git("for-each-ref", "--format=%(refname)", "refs/gallop-ui-check/")
+    .split("\n")
+    .filter(Boolean);
+  const blob = (rev, path) => {
+    const b = spawnSync("git", ["rev-parse", "-q", "--verify", `${rev}:${path}`], {
+      encoding: "utf8",
+    });
+    return b.status === 0 ? b.stdout.trim() : null;
+  };
+  return edits.filter((path) => {
+    const here = blob("HEAD", `${PREFIX}/${path}`);
+    return !tips.some((tip) => blob(tip, path) === here);
+  });
+}
+
+function check(mode) {
+  const staged = mode === "staged";
   const problems = [];
 
   if (staged) {
-    const files = git("diff", "--cached", "--name-only").split("\n").filter(Boolean);
+    // --no-renames: a file moved out of the layer counts as a layer change (its old path), not only an app one.
+    const files = git("diff", "--cached", "--name-only", "--no-renames")
+      .split("\n")
+      .filter(Boolean);
     const inLayer = files.filter((f) => f.startsWith(`${PREFIX}/`));
     if (inLayer.length && inLayer.length !== files.length) {
       problems.push(
         `This commit mixes ${PREFIX} with app files. Commit the layer change on its own ` +
           `(it goes back to gallop-ui with \`yarn ui:push\`), then the app change.`,
+      );
+    }
+  } else if (!existsSync(layer) && !layerInHead() && releaseCommit()) {
+    problems.push(
+      `${PREFIX} is gone, but this app pulled a gallop-ui release before. Put back that release ` +
+        `with \`git read-tree --prefix=${PREFIX}/ -u ${releaseCommit().slice(0, 12)}\` rather than deleting the layer.`,
+    );
+  } else if (existsSync(layer)) {
+    const edits = layerEdits();
+    if (edits === null) {
+      console.warn(
+        `gallop-ui check: no \`git subtree\` squash commit in the history (a shallow clone?), so ${PREFIX} ` +
+          `couldn't be compared with its release. Fetch the full history (fetch-depth: 0 in CI).`,
+      );
+    } else if (edits.length && mode === "pushed") {
+      const missing = unpushed(edits);
+      if (missing === null) {
+        console.warn(
+          `gallop-ui check: couldn't reach ${REMOTE} to see whether the layer edits were pushed.`,
+        );
+      } else if (missing.length) {
+        problems.push(
+          `${PREFIX} has edits that aren't on any gallop-ui branch (${missing.length} file(s): ${list(missing)}). ` +
+            `Send them back first: \`yarn ui:push <branch>\`, then open the PR in gallop-systems/gallop-ui. ` +
+            `(If that PR is already merged and released, \`yarn ui:pull\` instead.) An edit that isn't pushed ` +
+            `is lost on the next ui:pull.`,
+        );
+      }
+    } else if (edits.length) {
+      // CI can't reach the private gallop-ui repo, so here it is a reminder, not a failure.
+      const msg =
+        `${PREFIX} differs from the release it was pulled at (${edits.length} file(s): ${list(edits)}). ` +
+        `Make sure it's been sent back with \`yarn ui:push <branch>\` and has a PR in gallop-systems/gallop-ui.`;
+      console.warn(
+        process.env.GITHUB_ACTIONS
+          ? `::warning title=gallop-ui layer edits::${msg}`
+          : `gallop-ui check: ${msg}`,
       );
     }
   }
@@ -178,7 +284,11 @@ switch (command) {
     const branch = args[0];
     if (!branch) fail("Usage: yarn ui:push <branch-name-for-gallop-ui>");
     run("git", ["subtree", "push", `--prefix=${PREFIX}`, REMOTE, branch]);
-    console.log(`\nPushed. Open a PR in gallop-systems/gallop-ui from ${branch}.`);
+    console.log(
+      `\nPushed. Open the PR now (a Conventional Commit title, client-neutral):\n` +
+        `  https://github.com/gallop-systems/gallop-ui/compare/${branch}?expand=1\n` +
+        `Once it's released, take it here with \`yarn ui:pull\`.`,
+    );
     break;
   }
   case "impact": {
@@ -216,7 +326,7 @@ switch (command) {
     run("yarn", ["vitest", "run", "--root", PREFIX]);
     break;
   case "check":
-    check(args.includes("--staged"));
+    check(args.includes("--staged") ? "staged" : args.includes("--pushed") ? "pushed" : "plain");
     break;
   case "migrate": {
     const script = join(layer, "scripts", "migrate.mjs");

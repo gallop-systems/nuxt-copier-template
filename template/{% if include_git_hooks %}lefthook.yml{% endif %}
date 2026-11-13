@@ -31,6 +31,12 @@ pre-push:
       skip:
         - merge
         - rebase
+    # Edits to layers/gallop-ui must be sent back (yarn ui:push) before the app is pushed.
+    gallop-ui-pushed:
+      run: yarn ui:check --pushed
+      skip:
+        - merge
+        - rebase
     gallop-ui-test:
       run: yarn ui:test
       skip:
