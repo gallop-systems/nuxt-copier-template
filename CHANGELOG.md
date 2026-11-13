@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v2.1.0...v2.2.0) (2026-11-13)
+
+
+### Features
+
+* **gallop-ui:** require ui:push for layer edits (pre-push check, CI warning) ([#144](https://github.com/gallop-systems/nuxt-copier-template/issues/144)) ([78e4a3a](https://github.com/gallop-systems/nuxt-copier-template/commit/78e4a3aa303abfe2705d2856eb1b52482065e6f8))
+
 ## [2.1.0](https://github.com/gallop-systems/nuxt-copier-template/compare/v2.0.0...v2.1.0) (2026-10-29)
 
 
