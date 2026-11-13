@@ -113,10 +113,15 @@ function releaseCommit() {
   return git("log", "--grep", `^git-subtree-dir: ${PREFIX}$`, "-1", "--format=%H");
 }
 
+const layerInHead = () =>
+  spawnSync("git", ["rev-parse", "-q", "--verify", `HEAD:${PREFIX}`]).status === 0;
+
 /** Files where layers/gallop-ui differs from the release last pulled, or null if that can't be told. */
 function layerEdits() {
   const squash = releaseCommit();
   if (!squash) return null;
+  // Not committed yet (a fresh ui:add, or a layer put back and not yet committed): nothing to compare.
+  if (!layerInHead()) return [];
   if (git("rev-parse", `${squash}^{tree}`) === git("rev-parse", `HEAD:${PREFIX}`)) return [];
   return git("diff", "--name-only", squash, `HEAD:${PREFIX}`).split("\n").filter(Boolean);
 }
@@ -165,7 +170,10 @@ function check(mode) {
   const problems = [];
 
   if (staged) {
-    const files = git("diff", "--cached", "--name-only").split("\n").filter(Boolean);
+    // --no-renames: a file moved out of the layer counts as a layer change (its old path), not only an app one.
+    const files = git("diff", "--cached", "--name-only", "--no-renames")
+      .split("\n")
+      .filter(Boolean);
     const inLayer = files.filter((f) => f.startsWith(`${PREFIX}/`));
     if (inLayer.length && inLayer.length !== files.length) {
       problems.push(
@@ -173,6 +181,11 @@ function check(mode) {
           `(it goes back to gallop-ui with \`yarn ui:push\`), then the app change.`,
       );
     }
+  } else if (!existsSync(layer) && !layerInHead() && releaseCommit()) {
+    problems.push(
+      `${PREFIX} is gone, but this app pulled a gallop-ui release before. Put back that release ` +
+        `with \`git read-tree --prefix=${PREFIX}/ -u ${releaseCommit().slice(0, 12)}\` rather than deleting the layer.`,
+    );
   } else if (existsSync(layer)) {
     const edits = layerEdits();
     if (edits === null) {
