@@ -5,6 +5,7 @@
  * - /api/public/* (public endpoints)
  * - /api/webhooks/* (webhook endpoints with their own auth)
  * - /api/auth/* (authentication endpoints)
+ * - /api/_auth/* (nuxt-auth-utils' own session endpoint, which must answer signed-out visitors)
  */
 export default defineEventHandler(async (event) => {
   const path = getRequestURL(event).pathname;
@@ -12,7 +13,8 @@ export default defineEventHandler(async (event) => {
   if (
     path.startsWith("/api/public/") ||
     path.startsWith("/api/webhooks/") ||
-    path.startsWith("/api/auth/")
+    path.startsWith("/api/auth/") ||
+    path.startsWith("/api/_auth/")
   ) {
     return;
   }
