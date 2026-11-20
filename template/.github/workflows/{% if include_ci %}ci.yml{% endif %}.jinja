@@ -68,13 +68,46 @@ jobs:
           NUXT_DATABASE_URL_TEST: postgres://postgres:postgres@postgres:5432/{{ database_name }}-test?sslmode=disable
           NODE_OPTIONS: --experimental-strip-types
 
-  # Everything that doesn't touch the database, behind a SINGLE `yarn install`.
-  # Was three separate jobs (static / typecheck / test-frontend); each repaid a
-  # cold checkout + node + install (~1min) and billed its own rounded-up minute,
-  # so folding them removes redundant install minutes. They run sequentially
-  # here — `build` (the other heavy job) stays separate so the two 6GB-heap steps
-  # (typecheck + build) don't serialize and stretch the gate.
-  checks:
+  # Decides, without a `yarn install`, whether this PR can reach the gallop-ui
+  # layer's own tests. The layer is a vendored release (a git subtree), so its
+  # suite only changes outcome when the layer itself or the dependencies it runs
+  # against change. That suite was the slowest step in every app's CI (3-5 min)
+  # and ran on every PR; now a PR that touches neither skips it. Pushes to `main`
+  # always run it.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      layer: {% raw %}${{ steps.diff.outputs.layer }}{% endraw %}
+    steps:
+      - uses: actions/checkout@v4
+      - id: diff
+        env:
+          EVENT: {% raw %}${{ github.event_name }}{% endraw %}
+          BASE_SHA: {% raw %}${{ github.event.pull_request.base.sha }}{% endraw %}
+        run: |
+          if [ "$EVENT" != "pull_request" ] || [ ! -d layers/gallop-ui ]; then
+            [ -d layers/gallop-ui ] && echo "layer=true" >> "$GITHUB_OUTPUT" || echo "layer=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # HEAD is the PR's merge commit, so its tree diffed against the base
+          # tip is exactly what the PR changes. Any failure here runs the tests.
+          if git fetch -q --depth=1 origin "$BASE_SHA" && files=$(git diff --name-only FETCH_HEAD HEAD); then
+            echo "$files"
+            if echo "$files" | grep -qE '^(layers/gallop-ui/|package\.json$|yarn\.lock$|\.yarnrc\.yml$|\.yarn/|nuxt\.config\.ts$|\.github/workflows/)'; then
+              echo "layer=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "layer=false" >> "$GITHUB_OUTPUT"
+              echo "No change reaches layers/gallop-ui or its dependencies: skipping its tests."
+            fi
+          else
+            echo "layer=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  # Lint, format, the gallop-ui guards and typecheck: everything that doesn't
+  # run a test suite. oxlint + oxfmt are sub-second and run first so a
+  # lint/format failure surfaces before the slower typecheck. The test suites
+  # each get their own job below so they run beside this one, not after it.
+  static:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -94,21 +127,61 @@ jobs:
           key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
           restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
       - run: yarn install --immutable
-      # oxlint + oxfmt are Rust-fast (sub-second) and run first so a lint/format
-      # failure surfaces before the slower typecheck.
       - run: yarn lint
       - run: yarn fmt:check
+      # Nothing shadows a layer component, and a warning for layer edits not yet released.
+      - run: yarn ui:check
       - run: yarn typecheck
         env:
           # tsc is the memory-hungry step; give Node a larger heap so the
           # typecheck doesn't OOM on the runner as the project grows.
           NODE_OPTIONS: --experimental-strip-types --max-old-space-size=6144
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: corepack enable
+      - name: Get yarn cache directory
+        id: yarn-cache
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        with:
+          path: {% raw %}${{ steps.yarn-cache.outputs.dir }}{% endraw %}
+          key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
+          restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
+      - run: yarn install --immutable
       - run: yarn test:frontend:run
         env:
           NODE_OPTIONS: --experimental-strip-types
-      # Nothing shadows a layer component, and a warning for layer edits not yet released; then the layer's
-      # own tests, against this app's dependencies.
-      - run: yarn ui:check && yarn ui:test
+
+  # The layer's own tests, against this app's dependencies. Only when `changes`
+  # says this PR can reach them; a skipped run counts as passing in ci-success.
+  ui-test:
+    needs: changes
+    if: {% raw %}needs.changes.outputs.layer == 'true'{% endraw %}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: corepack enable
+      - name: Get yarn cache directory
+        id: yarn-cache
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        with:
+          path: {% raw %}${{ steps.yarn-cache.outputs.dir }}{% endraw %}
+          key: {% raw %}yarn-${{ runner.os }}-${{ hashFiles('yarn.lock') }}{% endraw %}
+          restore-keys: {% raw %}yarn-${{ runner.os }}-{% endraw %}
+      - run: yarn install --immutable
+      - run: yarn ui:test
+        env:
+          NODE_OPTIONS: --experimental-strip-types
 
   build:
     runs-on: ubuntu-latest
@@ -165,13 +238,16 @@ jobs:
           fi
           echo "✓ home route renders (no 5xx)"
 
-  # Stable aggregate gate to require in branch protection; passes only if every
-  # gating job did. Require THIS single context (not the individual jobs) so the
-  # required-checks list never has to change as jobs are added or renamed.
+  # Stable aggregate gate to require in branch protection; passes only if no
+  # gating job failed or was cancelled. `skipped` passes: ui-test skips by design
+  # when the PR can't reach the layer (and a job skipped because something it
+  # needs failed is already caught by that failure). Require THIS single context
+  # (not the individual jobs) so the required-checks list never has to change as
+  # jobs are added or renamed.
   ci-success:
     name: ci-success
     if: always()
-    needs: [test, checks, build]
+    needs: [test, changes, static, frontend, ui-test, build]
     runs-on: ubuntu-latest
     steps:
       - name: Verify all required jobs succeeded
@@ -179,6 +255,9 @@ jobs:
           results="{% raw %}${{ join(needs.*.result, ' ') }}{% endraw %}"
           echo "gating job results: $results"
           for r in $results; do
-            [ "$r" = "success" ] || { echo "✗ a required job failed or was skipped"; exit 1; }
+            case "$r" in
+              success|skipped) ;;
+              *) echo "✗ a required job failed or was cancelled"; exit 1 ;;
+            esac
           done
           echo "✓ all required jobs succeeded"
