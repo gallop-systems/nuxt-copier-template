@@ -64,6 +64,8 @@ export default isFrontendTest
           // Nuxt provides `#server` (server/ dir) in the app + nuxt-env test
           // build; plain-vitest backend tests don't get it, so map it here.
           "#server": path.resolve(__dirname, "server"),
+          // Same for `#shared` (Nuxt 4's shared/ dir, importable from server code).
+          "#shared": path.resolve(__dirname, "shared"),
         },
       },
     });

@@ -57,11 +57,21 @@ export async function setup() {
     throw err;
   }
 
-  // Drop all tables and types in public schema
+  // Drop everything the migrations create in the public schema: materialized
+  // views, extensions (PostGIS etc. — dropping their tables one by one fails,
+  // e.g. "cannot drop table spatial_ref_sys because extension postgis requires
+  // it"; migrations recreate them with CREATE EXTENSION IF NOT EXISTS), then
+  // tables and enum types.
   await pool.query(`
     DO $$ DECLARE
       r RECORD;
     BEGIN
+      FOR r IN (SELECT matviewname FROM pg_matviews WHERE schemaname = 'public') LOOP
+        EXECUTE 'DROP MATERIALIZED VIEW IF EXISTS ' || quote_ident(r.matviewname) || ' CASCADE';
+      END LOOP;
+      FOR r IN (SELECT e.extname FROM pg_extension e JOIN pg_namespace n ON n.oid = e.extnamespace WHERE n.nspname = 'public' AND e.extname <> 'plpgsql') LOOP
+        EXECUTE 'DROP EXTENSION IF EXISTS ' || quote_ident(r.extname) || ' CASCADE';
+      END LOOP;
       FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
         EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
       END LOOP;

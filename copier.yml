@@ -79,6 +79,12 @@ _tasks:
   # Create .env from example
   - command: "cp .env.example .env"
     when: "{{ _copier_operation == 'copy' }}"
+  # Give .env its own random session secret (32 bytes, hex), so sign-in works on
+  # the first `yarn dev`. Generated per project, never stored in the template.
+  - command: >-
+      node -e "const fs = require('fs'); const s = require('crypto').randomBytes(32).toString('hex');
+      fs.writeFileSync('.env', fs.readFileSync('.env', 'utf8').replace(/^NUXT_SESSION_PASSWORD=.*$/m, 'NUXT_SESSION_PASSWORD=' + s))"
+    when: "{{ _copier_operation == 'copy' }}"
   # Install dependencies (skip builds to avoid nuxt prepare before env is ready)
   - command: "yarn install"
     when: "{{ _copier_operation == 'copy' }}"
