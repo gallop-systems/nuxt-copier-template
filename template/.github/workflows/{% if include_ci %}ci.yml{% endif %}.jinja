@@ -91,9 +91,9 @@ jobs:
           fi
           # HEAD is the PR's merge commit, so its tree diffed against the base
           # tip is exactly what the PR changes. Any failure here runs the tests.
-          if git fetch -q --depth=1 origin "$BASE_SHA" && files=$(git diff --name-only FETCH_HEAD HEAD); then
+          if git fetch -q --depth=1 origin "$BASE_SHA" && files=$(git diff --name-only --no-renames FETCH_HEAD HEAD); then
             echo "$files"
-            if echo "$files" | grep -qE '^(layers/gallop-ui/|package\.json$|yarn\.lock$|\.yarnrc\.yml$|\.yarn/|nuxt\.config\.ts$|\.github/workflows/)'; then
+            if echo "$files" | grep -qE '^(layers/gallop-ui/|scripts/gallop-ui\.mjs$|package\.json$|yarn\.lock$|\.yarnrc\.yml$|\.yarn/|nuxt\.config\.ts$|\.github/workflows/)'; then
               echo "layer=true" >> "$GITHUB_OUTPUT"
             else
               echo "layer=false" >> "$GITHUB_OUTPUT"
